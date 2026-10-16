@@ -305,7 +305,7 @@ function MetricChart({
       <div className="mt-3 h-[168px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 8, right: 4, left: -26, bottom: 0 }}>
-            <McrPattern id={pid} />
+            {McrPattern({ id: pid })}
             <CartesianGrid strokeDasharray="2 4" stroke="var(--border)" vertical={false} />
             <XAxis dataKey="name" hide />
             <YAxis
@@ -421,7 +421,7 @@ function SubItemChart({ metricKey, ward }: { metricKey: MetricKey; ward: WardNam
       <div className="h-[280px] rounded-md border border-border bg-card p-3">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 8, right: 4, left: -22, bottom: 0 }}>
-            <McrPattern id={pid} />
+            {McrPattern({ id: pid })}
             <CartesianGrid strokeDasharray="2 4" stroke="var(--border)" vertical={false} />
             <XAxis
               dataKey="name"
