@@ -1,5 +1,5 @@
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { breakdown, ragOf, RAG_COLOR, type BreakdownRow, type Rag } from "@/data/dashboardData";
+import { TARGET, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { TARGET, breakdown, ragOf, RAG_COLOR, type BreakdownRow, type Rag } from "@/data/dashboardData";
 import { cn } from "@/lib/utils";
 
 const CELL_KEYS: { path: (r: BreakdownRow) => number; key: string; head: string }[] = [
@@ -82,7 +82,7 @@ const RAG_KEY: {
   {
     rag: "green",
     label: "On target",
-    threshold: "69% or above",
+    threshold: `${TARGET}% or above`,
   },
   {
     rag: "orange",
