@@ -1,4 +1,4 @@
-import { useId, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -56,17 +56,19 @@ function swatch(label: string, color?: string) {
 }
 
 function usePatternId() {
-  return `mcr-stripes-${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
+  return "mcr-stripes";
 }
 
 function McrPattern({ id }: { id: string }) {
   return (
+    <svg width="0" height="0" className="absolute" aria-hidden>
     <defs>
       <pattern id={id} width="5" height="5" patternUnits="userSpaceOnUse">
         <rect width="5" height="5" fill={MCR_COLOR} />
         <line x1="1" y1="0" x2="1" y2="5" stroke="var(--card)" strokeOpacity={0.6} strokeWidth="1.5" />
       </pattern>
     </defs>
+    </svg>
   );
 }
 
@@ -98,6 +100,7 @@ export function WardOverview() {
 
   return (
     <div className="space-y-6">
+      <McrPattern id="mcr-stripes" />
       <div className="border-b border-border pb-4">
         <div className="flex flex-wrap items-center gap-2">
           <h2 className="text-base font-semibold sm:text-lg">Ward overview</h2>
@@ -305,7 +308,6 @@ function MetricChart({
       <div className="mt-3 h-[168px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 8, right: 4, left: -26, bottom: 0 }}>
-            {McrPattern({ id: pid })}
             <CartesianGrid strokeDasharray="2 4" stroke="var(--border)" vertical={false} />
             <XAxis dataKey="name" hide />
             <YAxis
@@ -421,7 +423,6 @@ function SubItemChart({ metricKey, ward }: { metricKey: MetricKey; ward: WardNam
       <div className="h-[280px] rounded-md border border-border bg-card p-3">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 8, right: 4, left: -22, bottom: 0 }}>
-            {McrPattern({ id: pid })}
             <CartesianGrid strokeDasharray="2 4" stroke="var(--border)" vertical={false} />
             <XAxis
               dataKey="name"
