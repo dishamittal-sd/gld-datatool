@@ -40,7 +40,7 @@ import { cn } from "@/lib/utils";
 
 const OTHER_WARDS: WardName[] = WARDS.filter((w) => w !== PRIMARY_WARD);
 const SERIES_COLORS = ["var(--chart-2)", "var(--chart-4)", "var(--chart-5)"];
-const MCR_COLOR = "var(--muted-foreground)";
+const MCR_COLOR = "var(--rag-orange)";
 
 function colorFor(ward: string) {
   if (ward === MANCHESTER_LABEL) return MCR_COLOR;
@@ -241,7 +241,7 @@ function MetricChart({
   onOpen: () => void;
 }) {
   const metric = METRICS.find((m) => m.key === metricKey)!;
-  const series = [...wards, MANCHESTER_LABEL];
+  const series = [MANCHESTER_LABEL, ...wards];
   const data = [
     {
       name: metric.label,
@@ -305,7 +305,6 @@ function MetricChart({
                 key={s}
                 dataKey={s}
                 fill={colorFor(s)}
-                fillOpacity={s === MANCHESTER_LABEL ? 0.55 : 1}
                 radius={[2, 2, 0, 0]}
                 maxBarSize={34}
               />
@@ -348,7 +347,7 @@ function DetailDrawer({
               <SheetTitle>{metric.full}</SheetTitle>
               <SheetDescription>
                 {isElg
-                  ? `Sub-item attainment for ${focusWard} compared with the Manchester average.`
+                  ? `Early learning goals for ${focusWard} compared with the Manchester average.`
                   : `Early Learning Goals most closely linked with ${metric.full.toLowerCase()}, comparing children who achieved the milestone with those who did not.`}
               </SheetDescription>
             </SheetHeader>
@@ -397,13 +396,13 @@ function SubItemChart({
   const items = ELG_SUB_ITEMS[metricKey] ?? [];
   const data = items.map((it) => ({
     name: it.name,
-    [ward]: subItemScore(wardPerformance[ward][metricKey], it.offset),
     [MANCHESTER_LABEL]: subItemScore(manchesterAverage[metricKey], it.offset),
+    [ward]: subItemScore(wardPerformance[ward][metricKey], it.offset),
   }));
 
   return (
     <>
-      <Legend items={[ward, MANCHESTER_LABEL]} />
+      <Legend items={[MANCHESTER_LABEL, ward]} />
       <div className="h-[280px] rounded-md border border-border bg-card p-3">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 8, right: 4, left: -22, bottom: 0 }}>
@@ -424,14 +423,13 @@ function SubItemChart({
             />
             <Tooltip formatter={(v: number) => `${v}%`} contentStyle={tooltipStyle} />
             <ReferenceLine y={target} stroke="var(--foreground)" strokeOpacity={0.45} strokeDasharray="4 3" />
-            <Bar dataKey={ward} fill={colorFor(ward)} radius={[2, 2, 0, 0]} maxBarSize={40} />
             <Bar
               dataKey={MANCHESTER_LABEL}
               fill={MCR_COLOR}
-              fillOpacity={0.55}
               radius={[2, 2, 0, 0]}
               maxBarSize={40}
             />
+            <Bar dataKey={ward} fill={colorFor(ward)} radius={[2, 2, 0, 0]} maxBarSize={40} />
           </BarChart>
         </ResponsiveContainer>
       </div>
