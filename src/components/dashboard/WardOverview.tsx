@@ -29,6 +29,7 @@ import {
   MILESTONE_CORRELATIONS,
   MILESTONE_KEYS,
   PRIMARY_WARD,
+  TARGET,
   WARDS,
   manchesterAverage,
   subItemScore,
@@ -92,8 +93,8 @@ export function WardOverview() {
           <p>
             Collected at the start of the reception year in September 2026, this data establishes
             the starting point for tracking progress toward Good Level of Development (GLD) targets
-            in July 2027. Target thresholds for each Early Learning Goal and developmental milestone
-            are set in line with Manchester Local Authority priorities.
+            in July 2027. A single benchmark target of {TARGET}% applies across every Early Learning
+            Goal and developmental milestone.
           </p>
         </div>
       </div>
@@ -250,7 +251,7 @@ function MetricChart({
     },
   ];
   const primaryValue = wardPerformance[PRIMARY_WARD as WardName][metricKey];
-  const delta = primaryValue - metric.target;
+  const delta = primaryValue - TARGET;
 
   return (
     <button
@@ -264,7 +265,7 @@ function MetricChart({
             {metric.full}
           </h4>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            {metric.label} · target {metric.target}% · Manchester {manchesterAverage[metricKey]}%
+            {metric.label} · target {TARGET}% · Manchester {manchesterAverage[metricKey]}%
           </p>
         </div>
         <div className="shrink-0 text-right">
@@ -295,7 +296,7 @@ function MetricChart({
             />
             <Tooltip formatter={(v: number) => `${v}%`} contentStyle={tooltipStyle} />
             <ReferenceLine
-              y={metric.target}
+              y={TARGET}
               stroke="var(--foreground)"
               strokeOpacity={0.45}
               strokeDasharray="4 3"
@@ -372,7 +373,7 @@ function DetailDrawer({
 
             <div className="mt-5 space-y-3">
               {isElg ? (
-                <SubItemChart metricKey={metricKey} ward={focusWard} target={metric.target} />
+                <SubItemChart metricKey={metricKey} ward={focusWard} />
               ) : (
                 <CorrelationPanel metricKey={metricKey} />
               )}
@@ -384,15 +385,7 @@ function DetailDrawer({
   );
 }
 
-function SubItemChart({
-  metricKey,
-  ward,
-  target,
-}: {
-  metricKey: MetricKey;
-  ward: WardName;
-  target: number;
-}) {
+function SubItemChart({ metricKey, ward }: { metricKey: MetricKey; ward: WardName }) {
   const items = ELG_SUB_ITEMS[metricKey] ?? [];
   const data = items.map((it) => ({
     name: it.name,
@@ -422,7 +415,7 @@ function SubItemChart({
               unit="%"
             />
             <Tooltip formatter={(v: number) => `${v}%`} contentStyle={tooltipStyle} />
-            <ReferenceLine y={target} stroke="var(--foreground)" strokeOpacity={0.45} strokeDasharray="4 3" />
+            <ReferenceLine y={TARGET} stroke="var(--foreground)" strokeOpacity={0.45} strokeDasharray="4 3" />
             <Bar
               dataKey={MANCHESTER_LABEL}
               fill={MCR_COLOR}
@@ -477,6 +470,12 @@ function CorrelationPanel({ metricKey }: { metricKey: MetricKey }) {
               unit="%"
             />
             <Tooltip formatter={(v: number) => `${v}%`} contentStyle={tooltipStyle} />
+            <ReferenceLine
+              y={TARGET}
+              stroke="var(--foreground)"
+              strokeOpacity={0.45}
+              strokeDasharray="4 3"
+            />
             <Bar dataKey="Achieved" fill="var(--chart-1)" radius={[2, 2, 0, 0]} maxBarSize={40} />
             <Bar dataKey="Not achieved" fill="var(--muted-foreground)" fillOpacity={0.55} radius={[2, 2, 0, 0]} maxBarSize={40} />
           </BarChart>
@@ -528,12 +527,10 @@ function buildKeyMessages(selected: WardName[]): string[] {
   const gorton = wardPerformance[PRIMARY_WARD as WardName];
   const messages: string[] = [];
 
-  const aboveTarget = METRICS.filter((m) => gorton[m.key] >= m.target);
-  const strongest = [...METRICS].sort(
-    (a, b) => gorton[b.key] - b.target - (gorton[a.key] - a.target),
-  )[0]!;
+  const aboveTarget = METRICS.filter((m) => gorton[m.key] >= TARGET);
+  const strongest = [...METRICS].sort((a, b) => gorton[b.key] - gorton[a.key])[0]!;
   messages.push(
-    `${PRIMARY_WARD} meets or exceeds its target in ${aboveTarget.length} of ${METRICS.length} metrics, performing best in ${strongest.full} (${gorton[strongest.key]}% against a ${strongest.target}% target).`,
+    `${PRIMARY_WARD} meets or exceeds the ${TARGET}% benchmark target in ${aboveTarget.length} of ${METRICS.length} metrics, performing best in ${strongest.full} (${gorton[strongest.key]}%).`,
   );
 
   const aboveMcr = METRICS.filter((m) => gorton[m.key] >= manchesterAverage[m.key]);

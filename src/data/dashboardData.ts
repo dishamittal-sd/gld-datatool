@@ -2,13 +2,16 @@
 
 export type MetricKey = "CLC" | "TT" | "PSED" | "F" | "PD" | "PreSchool";
 
+/** Single global benchmark target used by every chart, side panel and metric. */
+export const TARGET = 69;
+
 export const METRICS: { key: MetricKey; label: string; full: string; target: number }[] = [
-  { key: "CLC", label: "CLC", full: "Communication & Language", target: 69 },
-  { key: "PSED", label: "PSED", full: "Personal, Social & Emotional Development", target: 69 },
-  { key: "PD", label: "PD", full: "Physical Development", target: 69 },
-  { key: "PreSchool", label: "Pre-school", full: "Pre-school Attendance", target: 69 },
-  { key: "TT", label: "TT", full: "Toilet Trained", target: 69 },
-  { key: "F", label: "F", full: "Feeding Independently", target: 69 },
+  { key: "CLC", label: "CLC", full: "Communication & Language", target: TARGET },
+  { key: "PSED", label: "PSED", full: "Personal, Social & Emotional Development", target: TARGET },
+  { key: "PD", label: "PD", full: "Physical Development", target: TARGET },
+  { key: "PreSchool", label: "Pre-school", full: "Pre-school Attendance", target: TARGET },
+  { key: "TT", label: "TT", full: "Toilet Trained", target: TARGET },
+  { key: "F", label: "F", full: "Feeding Independently", target: TARGET },
 ];
 
 export const PRIMARY_WARD = "Gorton";
@@ -268,7 +271,7 @@ export const manchester: RegionNode = {
 export type Rag = "green" | "orange" | "red";
 
 export function ragOf(value: number): Rag {
-  if (value >= 69) return "green";
+  if (value >= TARGET) return "green";
   if (value >= 60) return "orange";
   return "red";
 }
