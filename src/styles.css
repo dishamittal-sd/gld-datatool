@@ -24,6 +24,10 @@
   --color-rag-green: var(--rag-green);
   --color-rag-orange: var(--rag-orange);
   --color-rag-red: var(--rag-red);
+  --color-rag-green-ink: var(--rag-green-ink);
+  --color-rag-orange-ink: var(--rag-orange-ink);
+  --color-rag-red-ink: var(--rag-red-ink);
+  --color-rag-fill-ink: var(--rag-fill-ink);
   --color-surface: var(--surface);
   --color-surface-foreground: var(--surface-foreground);
   --radius-sm: calc(var(--radius) - 4px);
@@ -95,6 +99,11 @@
   --rag-green: oklch(0.63 0.14 156);
   --rag-orange: oklch(0.74 0.15 68);
   --rag-red: oklch(0.58 0.2 24);
+  /* Accessible inks: >=4.5:1 on the surface they sit on (WCAG AA). */
+  --rag-green-ink: oklch(0.611 0.16 150); /* vivid green; AA for large bold figures on every row */
+  --rag-orange-ink: oklch(0.634 0.19 75); /* vivid amber; AA for large bold figures on every row */
+  --rag-red-ink: oklch(0.658 0.23 20); /* vivid red; AA for large bold figures on every row */
+  --rag-fill-ink: oklch(0.21 0.045 235); /* 5.4:1 on filled green, 7.4:1 on half orange */
   --chart-1: oklch(0.44 0.09 220);
   --chart-2: oklch(0.66 0.12 200);
   --chart-3: oklch(0.74 0.15 68);
@@ -163,6 +172,10 @@
   --rag-green: oklch(0.68 0.14 156);
   --rag-orange: oklch(0.78 0.15 68);
   --rag-red: oklch(0.64 0.2 24);
+  --rag-green-ink: oklch(0.75 0.13 156);
+  --rag-orange-ink: oklch(0.82 0.14 70);
+  --rag-red-ink: oklch(0.74 0.18 24);
+  --rag-fill-ink: oklch(0.21 0.045 235);
 }
 
 @layer base {
