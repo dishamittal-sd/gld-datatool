@@ -38,7 +38,7 @@ import {
 } from "@/data/dashboardData";
 import { cn } from "@/lib/utils";
 
-const OTHER_WARDS = WARDS.filter((w) => w !== PRIMARY_WARD);
+const OTHER_WARDS: WardName[] = WARDS.filter((w) => w !== PRIMARY_WARD);
 const SERIES_COLORS = ["var(--chart-2)", "var(--chart-4)", "var(--chart-5)"];
 const MCR_COLOR = "var(--muted-foreground)";
 
