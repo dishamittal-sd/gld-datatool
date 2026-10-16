@@ -5,13 +5,14 @@ export type MetricKey = "CLC" | "TT" | "PSED" | "F" | "PD" | "PreSchool";
 /** Single global benchmark target used by every chart, side panel and metric. */
 export const TARGET = 69;
 
-export const METRICS: { key: MetricKey; label: string; full: string; target: number }[] = [
-  { key: "CLC", label: "CLC", full: "Communication & Language", target: TARGET },
-  { key: "PSED", label: "PSED", full: "Personal, Social & Emotional Development", target: TARGET },
-  { key: "PD", label: "PD", full: "Physical Development", target: TARGET },
-  { key: "PreSchool", label: "Pre-school", full: "Pre-school Attendance", target: TARGET },
-  { key: "TT", label: "TT", full: "Toilet Trained", target: TARGET },
-  { key: "F", label: "F", full: "Feeding Independently", target: TARGET },
+/** Metrics shown on the Ward view. There are no per-metric targets: TARGET is the only benchmark. */
+export const METRICS: { key: MetricKey; label: string; full: string }[] = [
+  { key: "CLC", label: "CLC", full: "Communication & Language" },
+  { key: "PSED", label: "PSED", full: "Personal, Social & Emotional Development" },
+  { key: "PD", label: "PD", full: "Physical Development" },
+  { key: "PreSchool", label: "Pre-school", full: "Pre-school Attendance" },
+  { key: "TT", label: "TT", full: "Toilet Trained" },
+  { key: "F", label: "F", full: "Feeding Independently" },
 ];
 
 export const PRIMARY_WARD = "Gorton";

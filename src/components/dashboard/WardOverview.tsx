@@ -265,7 +265,7 @@ function MetricChart({
             {metric.full}
           </h4>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            {metric.label} · target {TARGET}% · Manchester {manchesterAverage[metricKey]}%
+            {metric.label} · target {TARGET}%
           </p>
         </div>
         <div className="shrink-0 text-right">
@@ -395,7 +395,7 @@ function SubItemChart({ metricKey, ward }: { metricKey: MetricKey; ward: WardNam
 
   return (
     <>
-      <Legend items={[MANCHESTER_LABEL, ward]} />
+      <Legend items={[MANCHESTER_LABEL, ward]} showTarget />
       <div className="h-[280px] rounded-md border border-border bg-card p-3">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 8, right: 4, left: -22, bottom: 0 }}>
@@ -415,7 +415,12 @@ function SubItemChart({ metricKey, ward }: { metricKey: MetricKey; ward: WardNam
               unit="%"
             />
             <Tooltip formatter={(v: number) => `${v}%`} contentStyle={tooltipStyle} />
-            <ReferenceLine y={TARGET} stroke="var(--foreground)" strokeOpacity={0.45} strokeDasharray="4 3" />
+            <ReferenceLine
+              y={TARGET}
+              stroke="var(--foreground)"
+              strokeOpacity={0.45}
+              strokeDasharray="4 3"
+            />
             <Bar
               dataKey={MANCHESTER_LABEL}
               fill={MCR_COLOR}
@@ -450,7 +455,11 @@ function CorrelationPanel({ metricKey }: { metricKey: MetricKey }) {
 
   return (
     <>
-      <Legend items={["Achieved", "Not achieved"]} colors={["var(--chart-1)", "var(--muted-foreground)"]} />
+      <Legend
+        items={["Achieved", "Not achieved"]}
+        colors={["var(--chart-1)", "var(--muted-foreground)"]}
+        showTarget
+      />
       <div className="h-[280px] rounded-md border border-border bg-card p-3">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 8, right: 4, left: -22, bottom: 0 }}>
@@ -510,15 +519,29 @@ function CorrelationPanel({ metricKey }: { metricKey: MetricKey }) {
   );
 }
 
-function Legend({ items, colors }: { items: string[]; colors?: string[] }) {
+function Legend({
+  items,
+  colors,
+  showTarget,
+}: {
+  items: string[];
+  colors?: string[];
+  showTarget?: boolean;
+}) {
   return (
-    <div className="flex flex-wrap gap-3 text-xs">
+    <div className="flex flex-wrap items-center gap-3 text-xs">
       {items.map((it, i) => (
         <span key={it} className="inline-flex items-center gap-1.5">
           <span className="size-2.5 rounded-sm" style={{ backgroundColor: colors?.[i] ?? colorFor(it) }} />
           {it}
         </span>
       ))}
+      {showTarget && (
+        <span className="inline-flex items-center gap-1.5 text-muted-foreground">
+          <span className="w-4 border-t border-dashed border-foreground/60" />
+          Target {TARGET}%
+        </span>
+      )}
     </div>
   );
 }
