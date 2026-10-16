@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import {
   Bar,
   BarChart,
@@ -47,6 +47,27 @@ function colorFor(ward: string) {
   if (ward === MANCHESTER_LABEL) return MCR_COLOR;
   if (ward === PRIMARY_WARD) return "var(--chart-1)";
   return SERIES_COLORS[OTHER_WARDS.indexOf(ward as WardName) % SERIES_COLORS.length];
+}
+
+const MCR_SWATCH = `repeating-linear-gradient(90deg, ${MCR_COLOR} 0 2px, color-mix(in oklab, ${MCR_COLOR} 45%, var(--card)) 2px 4px)`;
+
+function swatch(label: string, color?: string) {
+  return label === MANCHESTER_LABEL ? { background: MCR_SWATCH } : { backgroundColor: color ?? colorFor(label) };
+}
+
+function usePatternId() {
+  return `mcr-stripes-${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
+}
+
+function McrPattern({ id }: { id: string }) {
+  return (
+    <defs>
+      <pattern id={id} width="5" height="5" patternUnits="userSpaceOnUse">
+        <rect width="5" height="5" fill={MCR_COLOR} />
+        <line x1="1" y1="0" x2="1" y2="5" stroke="var(--card)" strokeOpacity={0.6} strokeWidth="1.5" />
+      </pattern>
+    </defs>
+  );
 }
 
 const tooltipStyle = {
@@ -188,7 +209,7 @@ function Chip({ label, primary }: { label: string; primary?: boolean }) {
         primary && "border-primary/40",
       )}
     >
-      <span className="size-2 rounded-full" style={{ backgroundColor: colorFor(label) }} />
+      <span className="size-2.5 rounded-full" style={swatch(label)} />
       {label}
       {primary && (
         <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
@@ -250,6 +271,7 @@ function MetricChart({
   ];
   const primaryValue = wardPerformance[PRIMARY_WARD as WardName][metricKey];
   const delta = primaryValue - TARGET;
+  const pid = usePatternId();
 
   return (
     <button
@@ -263,7 +285,7 @@ function MetricChart({
             {metric.full}
           </h4>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            {metric.label} · target {TARGET}%
+            Target {TARGET}%
           </p>
         </div>
         <div className="shrink-0 text-right">
@@ -283,6 +305,7 @@ function MetricChart({
       <div className="mt-3 h-[168px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 8, right: 4, left: -26, bottom: 0 }}>
+            <McrPattern id={pid} />
             <CartesianGrid strokeDasharray="2 4" stroke="var(--border)" vertical={false} />
             <XAxis dataKey="name" hide />
             <YAxis
@@ -303,7 +326,7 @@ function MetricChart({
               <Bar
                 key={s}
                 dataKey={s}
-                fill={colorFor(s)}
+                fill={s === MANCHESTER_LABEL ? `url(#${pid})` : colorFor(s)}
                 radius={[2, 2, 0, 0]}
                 maxBarSize={34}
               />
@@ -351,7 +374,7 @@ function DetailDrawer({
               </SheetDescription>
             </SheetHeader>
 
-            {isElg && (
+            {(
               <div className="mt-4 flex flex-wrap gap-1.5">
                 {wards.map((w) => (
                   <button
@@ -373,7 +396,7 @@ function DetailDrawer({
               {isElg ? (
                 <SubItemChart metricKey={metricKey} ward={focusWard} />
               ) : (
-                <CorrelationPanel metricKey={metricKey} />
+                <CorrelationPanel metricKey={metricKey} ward={focusWard} />
               )}
             </div>
           </>
@@ -390,6 +413,7 @@ function SubItemChart({ metricKey, ward }: { metricKey: MetricKey; ward: WardNam
     [MANCHESTER_LABEL]: subItemScore(manchesterAverage[metricKey], it.offset),
     [ward]: subItemScore(wardPerformance[ward][metricKey], it.offset),
   }));
+  const pid = usePatternId();
 
   return (
     <>
@@ -397,6 +421,7 @@ function SubItemChart({ metricKey, ward }: { metricKey: MetricKey; ward: WardNam
       <div className="h-[280px] rounded-md border border-border bg-card p-3">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 8, right: 4, left: -22, bottom: 0 }}>
+            <McrPattern id={pid} />
             <CartesianGrid strokeDasharray="2 4" stroke="var(--border)" vertical={false} />
             <XAxis
               dataKey="name"
@@ -421,7 +446,7 @@ function SubItemChart({ metricKey, ward }: { metricKey: MetricKey; ward: WardNam
             />
             <Bar
               dataKey={MANCHESTER_LABEL}
-              fill={MCR_COLOR}
+              fill={`url(#${pid})`}
               radius={[2, 2, 0, 0]}
               maxBarSize={40}
             />
@@ -447,12 +472,13 @@ function SubItemChart({ metricKey, ward }: { metricKey: MetricKey; ward: WardNam
   );
 }
 
-function CorrelationPanel({ metricKey }: { metricKey: MetricKey }) {
-  const rows = MILESTONE_CORRELATIONS[metricKey] ?? [];
+function CorrelationPanel({ metricKey, ward }: { metricKey: MetricKey; ward: WardName }) {
+  const rows = (MILESTONE_CORRELATIONS[metricKey] ?? []).filter((r) => r.r >= 0.5);
   const data = rows.map((r) => ({ name: r.elg, Achieved: r.achieved, "Not achieved": r.notAchieved }));
 
   return (
     <>
+      <p className="text-sm font-semibold">Correlations for {ward}</p>
       <Legend
         items={["Achieved", "Not achieved"]}
         colors={["var(--chart-1)", "var(--muted-foreground)"]}
@@ -499,7 +525,6 @@ function CorrelationPanel({ metricKey }: { metricKey: MetricKey }) {
             <div key={r.elg} className="rounded-md border border-border bg-card p-3">
               <div className="flex items-center justify-between gap-3">
                 <span className="text-sm font-medium">{r.elg}</span>
-                <span className="text-sm font-bold tabular-nums">r = {r.r.toFixed(2)}</span>
               </div>
               <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-secondary">
                 <div className="h-full" style={{ width: `${r.r * 100}%`, backgroundColor: barColor }} />
@@ -530,7 +555,7 @@ function Legend({
     <div className="flex flex-wrap items-center gap-3 text-xs">
       {items.map((it, i) => (
         <span key={it} className="inline-flex items-center gap-1.5">
-          <span className="size-2.5 rounded-sm" style={{ backgroundColor: colors?.[i] ?? colorFor(it) }} />
+          <span className="size-2.5 rounded-sm" style={swatch(it, colors?.[i])} />
           {it}
         </span>
       ))}
