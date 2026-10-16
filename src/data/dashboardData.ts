@@ -336,21 +336,21 @@ export function subItemScore(parent: number, offset: number) {
 
 /** Mock correlation between each milestone and related ELG sub-items. */
 export const MILESTONE_CORRELATIONS: Partial<
-  Record<MetricKey, { elg: string; r: number; achieved: number; notAchieved: number }[]>
+  Record<MetricKey, { elg: string; r: number; achieved: number; notAchieved: number; manchester: number }[]>
 > = {
   TT: [
-    { elg: "Gross Motor Skills", r: 0.62, achieved: 84, notAchieved: 58 },
-    { elg: "Self-Regulation", r: 0.54, achieved: 82, notAchieved: 61 },
-    { elg: "Managing Self", r: 0.48, achieved: 73, notAchieved: 52 },
+    { elg: "Gross Motor Skills", r: 0.62, achieved: 84, notAchieved: 58, manchester: 77 },
+    { elg: "Self-Regulation", r: 0.54, achieved: 82, notAchieved: 61, manchester: 77 },
+    { elg: "Managing Self", r: 0.48, achieved: 73, notAchieved: 52, manchester: 68 },
   ],
   F: [
-    { elg: "Fine Motor Skills", r: 0.66, achieved: 83, notAchieved: 55 },
-    { elg: "Managing Self", r: 0.51, achieved: 72, notAchieved: 53 },
-    { elg: "Gross Motor Skills", r: 0.44, achieved: 80, notAchieved: 63 },
+    { elg: "Fine Motor Skills", r: 0.66, achieved: 83, notAchieved: 55, manchester: 76 },
+    { elg: "Managing Self", r: 0.51, achieved: 72, notAchieved: 53, manchester: 67 },
+    { elg: "Gross Motor Skills", r: 0.44, achieved: 80, notAchieved: 63, manchester: 76 },
   ],
   PreSchool: [
-    { elg: "Speaking", r: 0.58, achieved: 79, notAchieved: 56 },
-    { elg: "Building Relationships", r: 0.55, achieved: 76, notAchieved: 54 },
-    { elg: "Listening, Attention & Understanding", r: 0.52, achieved: 78, notAchieved: 59 },
+    { elg: "Speaking", r: 0.58, achieved: 79, notAchieved: 56, manchester: 73 },
+    { elg: "Building Relationships", r: 0.55, achieved: 76, notAchieved: 54, manchester: 70 },
+    { elg: "Listening, Attention & Understanding", r: 0.52, achieved: 78, notAchieved: 59, manchester: 73 },
   ],
 };

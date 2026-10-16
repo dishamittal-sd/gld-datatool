@@ -474,19 +474,26 @@ function SubItemChart({ metricKey, ward }: { metricKey: MetricKey; ward: WardNam
 
 function CorrelationPanel({ metricKey, ward }: { metricKey: MetricKey; ward: WardName }) {
   const rows = (MILESTONE_CORRELATIONS[metricKey] ?? []).filter((r) => r.r >= 0.5);
-  const data = rows.map((r) => ({ name: r.elg, Achieved: r.achieved, "Not achieved": r.notAchieved }));
+  const data = rows.map((r) => ({
+    name: r.elg,
+    [MANCHESTER_LABEL]: r.manchester,
+    Achieved: r.achieved,
+    "Not achieved": r.notAchieved,
+  }));
+  const pid = usePatternId();
 
   return (
     <>
       <p className="text-sm font-semibold">Correlations for {ward}</p>
       <Legend
-        items={["Achieved", "Not achieved"]}
-        colors={["var(--chart-1)", "var(--muted-foreground)"]}
+        items={[MANCHESTER_LABEL, "Achieved", "Not achieved"]}
+        colors={[MCR_COLOR, "var(--chart-1)", "var(--muted-foreground)"]}
         showTarget
       />
       <div className="h-[280px] rounded-md border border-border bg-card p-3">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 8, right: 4, left: -22, bottom: 0 }}>
+            <McrPattern id={pid} />
             <CartesianGrid strokeDasharray="2 4" stroke="var(--border)" vertical={false} />
             <XAxis
               dataKey="name"
@@ -509,6 +516,7 @@ function CorrelationPanel({ metricKey, ward }: { metricKey: MetricKey; ward: War
               strokeOpacity={0.45}
               strokeDasharray="4 3"
             />
+            <Bar dataKey={MANCHESTER_LABEL} fill={`url(#${pid})`} radius={[2, 2, 0, 0]} maxBarSize={40} />
             <Bar dataKey="Achieved" fill="var(--chart-1)" radius={[2, 2, 0, 0]} maxBarSize={40} />
             <Bar dataKey="Not achieved" fill="var(--muted-foreground)" fillOpacity={0.55} radius={[2, 2, 0, 0]} maxBarSize={40} />
           </BarChart>
