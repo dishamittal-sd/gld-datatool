@@ -265,7 +265,7 @@ function MetricChart({
             {metric.full}
           </h4>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            {metric.label} · target {TARGET}% · Manchester {manchesterAverage[metricKey]}%
+            {metric.label} · target {TARGET}%
           </p>
         </div>
         <div className="shrink-0 text-right">
@@ -415,7 +415,18 @@ function SubItemChart({ metricKey, ward }: { metricKey: MetricKey; ward: WardNam
               unit="%"
             />
             <Tooltip formatter={(v: number) => `${v}%`} contentStyle={tooltipStyle} />
-            <ReferenceLine y={TARGET} stroke="var(--foreground)" strokeOpacity={0.45} strokeDasharray="4 3" />
+            <ReferenceLine
+              y={TARGET}
+              stroke="var(--foreground)"
+              strokeOpacity={0.45}
+              strokeDasharray="4 3"
+              label={{
+                value: `Target ${TARGET}%`,
+                position: "insideTopRight",
+                fill: "var(--muted-foreground)",
+                fontSize: 10,
+              }}
+            />
             <Bar
               dataKey={MANCHESTER_LABEL}
               fill={MCR_COLOR}
@@ -475,6 +486,12 @@ function CorrelationPanel({ metricKey }: { metricKey: MetricKey }) {
               stroke="var(--foreground)"
               strokeOpacity={0.45}
               strokeDasharray="4 3"
+              label={{
+                value: `Target ${TARGET}%`,
+                position: "insideTopRight",
+                fill: "var(--muted-foreground)",
+                fontSize: 10,
+              }}
             />
             <Bar dataKey="Achieved" fill="var(--chart-1)" radius={[2, 2, 0, 0]} maxBarSize={40} />
             <Bar dataKey="Not achieved" fill="var(--muted-foreground)" fillOpacity={0.55} radius={[2, 2, 0, 0]} maxBarSize={40} />
