@@ -91,57 +91,55 @@ export function WardOverview() {
             Early Years Foundation Stage (EYFS) baseline data across Manchester’s 32 wards.
           </p>
           <p>
-            Collected at the start of the reception year in September 2026, this data establishes
-            the starting point for tracking progress toward Good Level of Development (GLD) targets
-            in July 2027. A single benchmark target of {TARGET}% applies across every Early Learning
-            Goal and developmental milestone.
+            Target thresholds for each Early Learning Goal and developmental milestone are set in
+            line with Manchester Local Authority priorities.
           </p>
         </div>
       </div>
 
       {/* Ward selection */}
       <div className="flex flex-col gap-3 rounded-md border border-primary/30 bg-primary/5 p-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="min-w-0 space-y-2">
+        <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+          <Chip label={MANCHESTER_LABEL} primary />
+          {wards.map((ward) => (
+            <Chip key={ward} label={ward} />
+          ))}
+        </div>
+
+        <div className="flex shrink-0 flex-wrap items-center gap-2 sm:justify-end">
           <p className="flex items-center gap-1.5 text-sm font-semibold">
             <SlidersHorizontal className="size-4 text-primary" />
             Select wards to compare
           </p>
-          <div className="flex flex-wrap items-center gap-1.5">
-            {wards.map((ward) => (
-              <Chip key={ward} label={ward} primary={ward === PRIMARY_WARD} />
-            ))}
-            <Chip label={MANCHESTER_LABEL} />
-          </div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button size="sm" className="h-9 shrink-0 justify-between gap-2 rounded-sm sm:w-56">
+                {selected.length ? `${selected.length} comparison ward(s)` : "Select wards"}
+                <ChevronDown className="size-4 opacity-70" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-60 rounded-sm p-1">
+              <div className="flex items-center justify-between px-2.5 py-1.5 text-xs text-muted-foreground">
+                <span className="font-medium text-foreground">{PRIMARY_WARD}</span>
+                <span className="label-caps">always shown</span>
+              </div>
+              {OTHER_WARDS.map((ward) => {
+                const active = selected.includes(ward);
+                return (
+                  <button
+                    key={ward}
+                    type="button"
+                    onClick={() => toggle(ward)}
+                    className="flex w-full items-center justify-between rounded-sm px-2.5 py-1.5 text-sm transition-colors hover:bg-secondary"
+                  >
+                    <span>{ward}</span>
+                    <Check className={cn("size-3.5", active ? "opacity-100" : "opacity-0")} />
+                  </button>
+                );
+              })}
+            </PopoverContent>
+          </Popover>
         </div>
-
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button size="sm" className="h-9 shrink-0 justify-between gap-2 rounded-sm sm:w-56">
-              {selected.length ? `${selected.length} comparison ward(s)` : "Select wards"}
-              <ChevronDown className="size-4 opacity-70" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent align="end" className="w-60 rounded-sm p-1">
-            <div className="flex items-center justify-between px-2.5 py-1.5 text-xs text-muted-foreground">
-              <span className="font-medium text-foreground">{PRIMARY_WARD}</span>
-              <span className="label-caps">primary</span>
-            </div>
-            {OTHER_WARDS.map((ward) => {
-              const active = selected.includes(ward);
-              return (
-                <button
-                  key={ward}
-                  type="button"
-                  onClick={() => toggle(ward)}
-                  className="flex w-full items-center justify-between rounded-sm px-2.5 py-1.5 text-sm transition-colors hover:bg-secondary"
-                >
-                  <span>{ward}</span>
-                  <Check className={cn("size-3.5", active ? "opacity-100" : "opacity-0")} />
-                </button>
-              );
-            })}
-          </PopoverContent>
-        </Popover>
       </div>
 
       <ChartSection
