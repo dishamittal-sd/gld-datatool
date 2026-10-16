@@ -310,7 +310,7 @@ function ElgChart({
   peerLabel,
 }: {
   eyfs: EyfsScores;
-  previous?: EyfsScores;
+  previous?: EyfsScores | undefined;
   peers: Peer[];
   peerLabel: string;
 }) {
