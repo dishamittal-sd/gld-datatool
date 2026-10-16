@@ -289,3 +289,64 @@ export function ragLabel(value: number): string {
   const r = ragOf(value);
   return r === "green" ? "On Target" : r === "orange" ? "Approaching" : "Below Target";
 }
+
+/* ---------- Ward view: Manchester benchmark & drill-downs ---------- */
+
+export const DATA_PERIOD = "September 2026";
+
+export const MANCHESTER_LABEL = "Manchester Average";
+
+/** Mock Manchester-wide average across all 32 wards. */
+export const manchesterAverage: Record<MetricKey, number> = {
+  CLC: 72,
+  TT: 80,
+  PSED: 75,
+  F: 81,
+  PD: 78,
+  PreSchool: 71,
+};
+
+export const ELG_KEYS: MetricKey[] = ["CLC", "PSED", "PD"];
+export const MILESTONE_KEYS: MetricKey[] = ["TT", "F", "PreSchool"];
+
+export const ELG_SUB_ITEMS: Partial<Record<MetricKey, { name: string; offset: number }[]>> = {
+  CLC: [
+    { name: "Listening, Attention & Understanding", offset: 2 },
+    { name: "Speaking", offset: -2 },
+  ],
+  PSED: [
+    { name: "Self-Regulation", offset: 3 },
+    { name: "Managing Self", offset: -3 },
+    { name: "Building Relationships", offset: 0 },
+  ],
+  PD: [
+    { name: "Gross Motor Skills", offset: 3 },
+    { name: "Fine Motor Skills", offset: -3 },
+  ],
+};
+
+/** Mock sub-item score: derived from the parent ELG score plus a fixed offset. */
+export function subItemScore(parent: number, offset: number) {
+  return Math.max(0, Math.min(100, parent + offset));
+}
+
+/** Mock correlation between each milestone and related ELG sub-items. */
+export const MILESTONE_CORRELATIONS: Partial<
+  Record<MetricKey, { elg: string; r: number; achieved: number; notAchieved: number }[]>
+> = {
+  TT: [
+    { elg: "Gross Motor Skills", r: 0.62, achieved: 84, notAchieved: 58 },
+    { elg: "Self-Regulation", r: 0.54, achieved: 82, notAchieved: 61 },
+    { elg: "Managing Self", r: 0.48, achieved: 73, notAchieved: 52 },
+  ],
+  F: [
+    { elg: "Fine Motor Skills", r: 0.66, achieved: 83, notAchieved: 55 },
+    { elg: "Managing Self", r: 0.51, achieved: 72, notAchieved: 53 },
+    { elg: "Gross Motor Skills", r: 0.44, achieved: 80, notAchieved: 63 },
+  ],
+  PreSchool: [
+    { elg: "Speaking", r: 0.58, achieved: 79, notAchieved: 56 },
+    { elg: "Building Relationships", r: 0.55, achieved: 76, notAchieved: 54 },
+    { elg: "Listening, Attention & Understanding", r: 0.52, achieved: 78, notAchieved: 59 },
+  ],
+};

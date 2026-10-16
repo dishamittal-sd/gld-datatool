@@ -9,32 +9,56 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { Check, ChevronDown } from "lucide-react";
+import { CalendarDays, Check, ChevronDown, MousePointerClick, SlidersHorizontal } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import {
+  DATA_PERIOD,
+  ELG_KEYS,
+  ELG_SUB_ITEMS,
+  MANCHESTER_LABEL,
   METRICS,
+  MILESTONE_CORRELATIONS,
+  MILESTONE_KEYS,
   PRIMARY_WARD,
   WARDS,
+  manchesterAverage,
+  subItemScore,
   wardPerformance,
   type MetricKey,
   type WardName,
 } from "@/data/dashboardData";
 import { cn } from "@/lib/utils";
 
-const OTHER_WARDS = WARDS.filter((w) => w !== PRIMARY_WARD);
-
+const OTHER_WARDS: WardName[] = WARDS.filter((w) => w !== PRIMARY_WARD);
 const SERIES_COLORS = ["var(--chart-2)", "var(--chart-4)", "var(--chart-5)"];
+const MCR_COLOR = "var(--muted-foreground)";
 
-function colorFor(ward: WardName) {
+function colorFor(ward: string) {
+  if (ward === MANCHESTER_LABEL) return MCR_COLOR;
   if (ward === PRIMARY_WARD) return "var(--chart-1)";
-  return SERIES_COLORS[OTHER_WARDS.indexOf(ward) % SERIES_COLORS.length];
+  return SERIES_COLORS[OTHER_WARDS.indexOf(ward as WardName) % SERIES_COLORS.length];
 }
+
+const tooltipStyle = {
+  background: "var(--card)",
+  border: "1px solid var(--border)",
+  borderRadius: 4,
+  fontSize: 12,
+};
 
 export function WardOverview() {
   const [selected, setSelected] = useState<WardName[]>(["Levenshulme", "Cheetham"]);
+  const [focusWard, setFocusWard] = useState<WardName>(PRIMARY_WARD as WardName);
+  const [openMetric, setOpenMetric] = useState<MetricKey | null>(null);
 
   const wards = useMemo<WardName[]>(
     () => [PRIMARY_WARD as WardName, ...WARDS.filter((w) => selected.includes(w))],
@@ -42,57 +66,58 @@ export function WardOverview() {
   );
 
   const toggle = (ward: WardName) =>
-    setSelected((prev) =>
-      prev.includes(ward) ? prev.filter((w) => w !== ward) : [...prev, ward],
-    );
+    setSelected((prev) => {
+      const next = prev.includes(ward) ? prev.filter((w) => w !== ward) : [...prev, ward];
+      if (!next.includes(focusWard) && focusWard !== PRIMARY_WARD) setFocusWard(PRIMARY_WARD as WardName);
+      return next;
+    });
 
   const keyMessages = useMemo(() => buildKeyMessages(selected), [selected]);
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       <div className="border-b border-border pb-4">
-        <h2 className="text-base font-semibold sm:text-lg">Ward overview</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          An overview of early learning goal attainment and key developmental milestones for
-          children in the ward.
-        </p>
+        <div className="flex flex-wrap items-center gap-2">
+          <h2 className="text-base font-semibold sm:text-lg">Ward overview</h2>
+          <span className="inline-flex items-center gap-1 rounded-sm border border-primary/40 bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
+            <CalendarDays className="size-3.5" />
+            {DATA_PERIOD}
+          </span>
+        </div>
+        <div className="mt-2 max-w-4xl space-y-2 text-sm leading-relaxed text-muted-foreground">
+          <p>
+            This page provides a ward-by-ward comparative view of key development milestones and
+            Early Years Foundation Stage (EYFS) baseline data across Manchester’s 32 wards.
+          </p>
+          <p>
+            Collected at the start of the reception year in September 2026, this data establishes
+            the starting point for tracking progress toward Good Level of Development (GLD) targets
+            in July 2027. Target thresholds for each Early Learning Goal and developmental milestone
+            are set in line with Manchester Local Authority priorities.
+          </p>
+        </div>
       </div>
 
-      {/* Controls: quiet, borderless strip */}
-      <div className="flex flex-col gap-3 border-b border-border pb-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex min-w-0 flex-wrap items-center gap-1.5">
-          <span className="mr-1 label-caps">Comparing</span>
-          {wards.map((ward) => (
-            <span
-              key={ward}
-              className={cn(
-                "inline-flex items-center gap-1.5 rounded-sm border border-border px-2 py-0.5 text-xs font-medium",
-                ward === PRIMARY_WARD && "border-primary/40 bg-primary/5",
-              )}
-            >
-              <span
-                className="size-2 rounded-full"
-                style={{ backgroundColor: colorFor(ward) }}
-              />
-              {ward}
-              {ward === PRIMARY_WARD && (
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  primary
-                </span>
-              )}
-            </span>
-          ))}
+      {/* Ward selection */}
+      <div className="flex flex-col gap-3 rounded-md border border-primary/30 bg-primary/5 p-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0 space-y-2">
+          <p className="flex items-center gap-1.5 text-sm font-semibold">
+            <SlidersHorizontal className="size-4 text-primary" />
+            Select wards to compare
+          </p>
+          <div className="flex flex-wrap items-center gap-1.5">
+            {wards.map((ward) => (
+              <Chip key={ward} label={ward} primary={ward === PRIMARY_WARD} />
+            ))}
+            <Chip label={MANCHESTER_LABEL} />
+          </div>
         </div>
 
         <Popover>
           <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              size="sm"
-              className="h-8 shrink-0 justify-between gap-2 rounded-sm text-xs font-medium sm:w-48"
-            >
+            <Button size="sm" className="h-9 shrink-0 justify-between gap-2 rounded-sm sm:w-56">
               {selected.length ? `${selected.length} comparison ward(s)` : "Select wards"}
-              <ChevronDown className="size-3.5 opacity-50" />
+              <ChevronDown className="size-4 opacity-70" />
             </Button>
           </PopoverTrigger>
           <PopoverContent align="end" className="w-60 rounded-sm p-1">
@@ -118,11 +143,20 @@ export function WardOverview() {
         </Popover>
       </div>
 
-      <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2 xl:grid-cols-3">
-        {METRICS.map((metric) => (
-          <MetricChart key={metric.key} metricKey={metric.key} wards={wards} />
-        ))}
-      </div>
+      <ChartSection
+        title="Early Learning Goals"
+        hint="Click a chart to see its sub-item breakdown"
+        keys={ELG_KEYS}
+        wards={wards}
+        onOpen={setOpenMetric}
+      />
+      <ChartSection
+        title="Key Development Milestones"
+        hint="Click a chart to see correlated Early Learning Goals"
+        keys={MILESTONE_KEYS}
+        wards={wards}
+        onOpen={setOpenMetric}
+      />
 
       <section className="rounded-md border border-border bg-card p-4">
         <h2 className="label-caps">Key messages</h2>
@@ -135,28 +169,102 @@ export function WardOverview() {
           ))}
         </ul>
       </section>
+
+      <DetailDrawer
+        metricKey={openMetric}
+        wards={wards}
+        focusWard={focusWard}
+        onFocusWard={setFocusWard}
+        onClose={() => setOpenMetric(null)}
+      />
     </div>
   );
 }
 
-function MetricChart({ metricKey, wards }: { metricKey: MetricKey; wards: WardName[] }) {
+function Chip({ label, primary }: { label: string; primary?: boolean }) {
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-sm border border-border bg-card px-2 py-0.5 text-xs font-medium",
+        primary && "border-primary/40",
+      )}
+    >
+      <span className="size-2 rounded-full" style={{ backgroundColor: colorFor(label) }} />
+      {label}
+      {primary && (
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          primary
+        </span>
+      )}
+    </span>
+  );
+}
+
+function ChartSection({
+  title,
+  hint,
+  keys,
+  wards,
+  onOpen,
+}: {
+  title: string;
+  hint: string;
+  keys: MetricKey[];
+  wards: WardName[];
+  onOpen: (k: MetricKey) => void;
+}) {
+  return (
+    <section className="space-y-3">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <h3 className="text-base font-semibold">{title}</h3>
+        <p className="flex items-center gap-1 text-xs text-muted-foreground">
+          <MousePointerClick className="size-3.5" />
+          {hint}
+        </p>
+      </div>
+      <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2 xl:grid-cols-3">
+        {keys.map((k) => (
+          <MetricChart key={k} metricKey={k} wards={wards} onOpen={() => onOpen(k)} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function MetricChart({
+  metricKey,
+  wards,
+  onOpen,
+}: {
+  metricKey: MetricKey;
+  wards: WardName[];
+  onOpen: () => void;
+}) {
   const metric = METRICS.find((m) => m.key === metricKey)!;
+  const series = [...wards, MANCHESTER_LABEL];
   const data = [
     {
       name: metric.label,
       ...Object.fromEntries(wards.map((w) => [w, wardPerformance[w][metricKey]])),
+      [MANCHESTER_LABEL]: manchesterAverage[metricKey],
     },
   ];
   const primaryValue = wardPerformance[PRIMARY_WARD as WardName][metricKey];
   const delta = primaryValue - metric.target;
 
   return (
-    <div className="bg-card p-4">
+    <button
+      type="button"
+      onClick={onOpen}
+      className="group bg-card p-4 text-left transition-colors hover:bg-secondary/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    >
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
         <div className="min-w-0">
-          <h3 className="text-sm font-semibold leading-snug">{metric.full}</h3>
+          <h4 className="text-sm font-semibold leading-snug group-hover:text-primary">
+            {metric.full}
+          </h4>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            {metric.label} · target {metric.target}%
+            {metric.label} · target {metric.target}% · Manchester {manchesterAverage[metricKey]}%
           </p>
         </div>
         <div className="shrink-0 text-right">
@@ -185,27 +293,228 @@ function MetricChart({ metricKey, wards }: { metricKey: MetricKey; wards: WardNa
               axisLine={false}
               unit="%"
             />
-            <Tooltip
-              formatter={(v: number) => `${v}%`}
-              contentStyle={{
-                background: "var(--card)",
-                border: "1px solid var(--border)",
-                borderRadius: 4,
-                fontSize: 12,
-              }}
-            />
+            <Tooltip formatter={(v: number) => `${v}%`} contentStyle={tooltipStyle} />
             <ReferenceLine
               y={metric.target}
               stroke="var(--foreground)"
               strokeOpacity={0.45}
               strokeDasharray="4 3"
             />
-            {wards.map((ward) => (
-              <Bar key={ward} dataKey={ward} fill={colorFor(ward)} radius={[2, 2, 0, 0]} maxBarSize={34} />
+            {series.map((s) => (
+              <Bar
+                key={s}
+                dataKey={s}
+                fill={colorFor(s)}
+                fillOpacity={s === MANCHESTER_LABEL ? 0.55 : 1}
+                radius={[2, 2, 0, 0]}
+                maxBarSize={34}
+              />
             ))}
           </BarChart>
         </ResponsiveContainer>
       </div>
+      <p className="mt-1 text-[11px] font-medium text-primary opacity-70 group-hover:opacity-100">
+        View details →
+      </p>
+    </button>
+  );
+}
+
+function DetailDrawer({
+  metricKey,
+  wards,
+  focusWard,
+  onFocusWard,
+  onClose,
+}: {
+  metricKey: MetricKey | null;
+  wards: WardName[];
+  focusWard: WardName;
+  onFocusWard: (w: WardName) => void;
+  onClose: () => void;
+}) {
+  const metric = metricKey ? METRICS.find((m) => m.key === metricKey) : null;
+  const isElg = metricKey ? ELG_KEYS.includes(metricKey) : false;
+
+  return (
+    <Sheet open={!!metricKey} onOpenChange={(o) => !o && onClose()}>
+      <SheetContent className="w-full overflow-y-auto sm:max-w-lg">
+        {metric && metricKey && (
+          <>
+            <SheetHeader>
+              <p className="label-caps">
+                {isElg ? "Early Learning Goal breakdown" : "Milestone correlation"}
+              </p>
+              <SheetTitle>{metric.full}</SheetTitle>
+              <SheetDescription>
+                {isElg
+                  ? `Sub-item attainment for ${focusWard} compared with the Manchester average.`
+                  : `Early Learning Goals most closely linked with ${metric.full.toLowerCase()}, comparing children who achieved the milestone with those who did not.`}
+              </SheetDescription>
+            </SheetHeader>
+
+            {isElg && (
+              <div className="mt-4 flex flex-wrap gap-1.5">
+                {wards.map((w) => (
+                  <button
+                    key={w}
+                    type="button"
+                    onClick={() => onFocusWard(w)}
+                    className={cn(
+                      "rounded-sm border border-border px-2 py-0.5 text-xs font-medium transition-colors",
+                      w === focusWard ? "border-primary bg-primary text-primary-foreground" : "hover:bg-secondary",
+                    )}
+                  >
+                    {w}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <div className="mt-5 space-y-3">
+              {isElg ? (
+                <SubItemChart metricKey={metricKey} ward={focusWard} target={metric.target} />
+              ) : (
+                <CorrelationPanel metricKey={metricKey} />
+              )}
+            </div>
+          </>
+        )}
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+function SubItemChart({
+  metricKey,
+  ward,
+  target,
+}: {
+  metricKey: MetricKey;
+  ward: WardName;
+  target: number;
+}) {
+  const items = ELG_SUB_ITEMS[metricKey] ?? [];
+  const data = items.map((it) => ({
+    name: it.name,
+    [ward]: subItemScore(wardPerformance[ward][metricKey], it.offset),
+    [MANCHESTER_LABEL]: subItemScore(manchesterAverage[metricKey], it.offset),
+  }));
+
+  return (
+    <>
+      <Legend items={[ward, MANCHESTER_LABEL]} />
+      <div className="h-[280px] rounded-md border border-border bg-card p-3">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={data} margin={{ top: 8, right: 4, left: -22, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="2 4" stroke="var(--border)" vertical={false} />
+            <XAxis
+              dataKey="name"
+              tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
+              tickLine={false}
+              axisLine={false}
+              interval={0}
+            />
+            <YAxis
+              domain={[0, 100]}
+              tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
+              tickLine={false}
+              axisLine={false}
+              unit="%"
+            />
+            <Tooltip formatter={(v: number) => `${v}%`} contentStyle={tooltipStyle} />
+            <ReferenceLine y={target} stroke="var(--foreground)" strokeOpacity={0.45} strokeDasharray="4 3" />
+            <Bar dataKey={ward} fill={colorFor(ward)} radius={[2, 2, 0, 0]} maxBarSize={40} />
+            <Bar
+              dataKey={MANCHESTER_LABEL}
+              fill={MCR_COLOR}
+              fillOpacity={0.55}
+              radius={[2, 2, 0, 0]}
+              maxBarSize={40}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+      <ul className="space-y-1.5">
+        {data.map((d) => {
+          const gap = (d[ward] as number) - (d[MANCHESTER_LABEL] as number);
+          return (
+            <li key={d.name} className="flex justify-between gap-3 border-b border-border py-1.5 text-sm">
+              <span>{d.name}</span>
+              <span className={cn("font-semibold tabular-nums", gap >= 0 ? "text-rag-green" : "text-rag-red")}>
+                {gap >= 0 ? "+" : "−"}
+                {Math.abs(gap)} pts vs Manchester
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+    </>
+  );
+}
+
+function CorrelationPanel({ metricKey }: { metricKey: MetricKey }) {
+  const rows = MILESTONE_CORRELATIONS[metricKey] ?? [];
+  const data = rows.map((r) => ({ name: r.elg, Achieved: r.achieved, "Not achieved": r.notAchieved }));
+
+  return (
+    <>
+      <Legend items={["Achieved", "Not achieved"]} colors={["var(--chart-1)", MCR_COLOR]} />
+      <div className="h-[280px] rounded-md border border-border bg-card p-3">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={data} margin={{ top: 8, right: 4, left: -22, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="2 4" stroke="var(--border)" vertical={false} />
+            <XAxis
+              dataKey="name"
+              tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
+              tickLine={false}
+              axisLine={false}
+              interval={0}
+            />
+            <YAxis
+              domain={[0, 100]}
+              tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
+              tickLine={false}
+              axisLine={false}
+              unit="%"
+            />
+            <Tooltip formatter={(v: number) => `${v}%`} contentStyle={tooltipStyle} />
+            <Bar dataKey="Achieved" fill="var(--chart-1)" radius={[2, 2, 0, 0]} maxBarSize={40} />
+            <Bar dataKey="Not achieved" fill={MCR_COLOR} fillOpacity={0.55} radius={[2, 2, 0, 0]} maxBarSize={40} />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+      <div className="grid gap-2">
+        {rows.map((r) => (
+          <div key={r.elg} className="rounded-md border border-border bg-card p-3">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-sm font-medium">{r.elg}</span>
+              <span className="text-sm font-bold tabular-nums">r = {r.r.toFixed(2)}</span>
+            </div>
+            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-secondary">
+              <div className="h-full bg-primary" style={{ width: `${r.r * 100}%` }} />
+            </div>
+            <p className="mt-1.5 text-xs text-muted-foreground">
+              {r.r >= 0.6 ? "Strong" : r.r >= 0.5 ? "Moderate" : "Weak–moderate"} positive
+              correlation · {r.achieved - r.notAchieved} pt attainment gap
+            </p>
+          </div>
+        ))}
+      </div>
+      <p className="text-[11px] text-muted-foreground">Illustrative correlation figures (mock data).</p>
+    </>
+  );
+}
+
+function Legend({ items, colors }: { items: string[]; colors?: string[] }) {
+  return (
+    <div className="flex flex-wrap gap-3 text-xs">
+      {items.map((it, i) => (
+        <span key={it} className="inline-flex items-center gap-1.5">
+          <span className="size-2.5 rounded-sm" style={{ backgroundColor: colors?.[i] ?? colorFor(it) }} />
+          {it}
+        </span>
+      ))}
     </div>
   );
 }
@@ -215,49 +524,33 @@ function buildKeyMessages(selected: WardName[]): string[] {
   const messages: string[] = [];
 
   const aboveTarget = METRICS.filter((m) => gorton[m.key] >= m.target);
-  const belowTarget = METRICS.filter((m) => gorton[m.key] < m.target);
-
   const strongest = [...METRICS].sort(
     (a, b) => gorton[b.key] - b.target - (gorton[a.key] - a.target),
   )[0]!;
   messages.push(
-    aboveTarget.length
-      ? `${PRIMARY_WARD} meets or exceeds its bespoke target in ${aboveTarget.length} of ${METRICS.length} metrics, performing best in ${strongest.full} (${gorton[strongest.key]}% against a ${strongest.target}% target).`
-      : `${PRIMARY_WARD} sits below its bespoke target across all ${METRICS.length} metrics, coming closest in ${strongest.full} (${gorton[strongest.key]}% against a ${strongest.target}% target).`,
+    `${PRIMARY_WARD} meets or exceeds its target in ${aboveTarget.length} of ${METRICS.length} metrics, performing best in ${strongest.full} (${gorton[strongest.key]}% against a ${strongest.target}% target).`,
   );
 
-  const widestGap = [...belowTarget].sort(
-    (a, b) => b.target - gorton[b.key] - (a.target - gorton[a.key]),
-  )[0];
-  if (widestGap) {
-    messages.push(
-      `The widest gap to target is ${widestGap.full} at ${gorton[widestGap.key]}% against a ${widestGap.target}% target (${widestGap.target - gorton[widestGap.key]} percentage points short).`,
-    );
-  } else {
-    messages.push(`Every metric in ${PRIMARY_WARD} is on or above its bespoke target this cycle.`);
-  }
+  const aboveMcr = METRICS.filter((m) => gorton[m.key] >= manchesterAverage[m.key]);
+  messages.push(
+    `Against the Manchester average, ${PRIMARY_WARD} is level or ahead in ${aboveMcr.length} of ${METRICS.length} metrics${
+      aboveMcr.length ? ` (${formatList(aboveMcr.map((m) => m.label))})` : ""
+    }.`,
+  );
 
   if (!selected.length) {
-    messages.push(
-      "Select one or more comparison wards to benchmark Gorton against the rest of the locality.",
-    );
-    return messages.slice(0, 3);
+    messages.push("Select one or more comparison wards to benchmark Gorton against other wards.");
+    return messages;
   }
 
-  const wins = METRICS.filter((m) =>
-    selected.every((w) => gorton[m.key] > wardPerformance[w][m.key]),
-  );
-  const losses = METRICS.filter((m) =>
-    selected.every((w) => gorton[m.key] < wardPerformance[w][m.key]),
-  );
-
+  const wins = METRICS.filter((m) => selected.every((w) => gorton[m.key] > wardPerformance[w][m.key]));
+  const losses = METRICS.filter((m) => selected.every((w) => gorton[m.key] < wardPerformance[w][m.key]));
   messages.push(
     `Compared with ${formatList(selected)}, ${PRIMARY_WARD} leads on ${
       wins.length ? formatList(wins.map((m) => m.label)) : "no metric"
     } and trails on ${losses.length ? formatList(losses.map((m) => m.label)) : "no metric"}.`,
   );
-
-  return messages.slice(0, 3);
+  return messages;
 }
 
 function formatList(items: string[]) {
