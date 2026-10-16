@@ -1,4 +1,4 @@
-import { breakdown, ragOf, type BreakdownRow } from "@/data/dashboardData";
+import { TARGET, breakdown, ragOf, type BreakdownRow } from "@/data/dashboardData";
 import { cn } from "@/lib/utils";
 
 const CELL_KEYS: { path: (r: BreakdownRow) => number; key: string; head: string }[] = [
@@ -47,7 +47,7 @@ export function GlanceBreakdown() {
           <li className="flex items-center gap-2 text-sm">
             <span className="size-2.5 shrink-0 rounded-full bg-rag-green" />
             <span>
-              <span className="font-semibold">Green</span> — 69% or above (on target)
+              <span className="font-semibold">Green</span> — {TARGET}% or above (on target)
             </span>
           </li>
           <li className="flex items-center gap-2 text-sm">

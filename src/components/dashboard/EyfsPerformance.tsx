@@ -16,6 +16,7 @@ import { ArrowLeft, ChevronRight, School } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   RAG_COLOR,
+  TARGET,
   manchester,
   ragLabel,
   ragOf,
@@ -26,7 +27,6 @@ import {
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-const TARGET = 69;
 
 function ragTextClass(v: number) {
   const r = ragOf(v);
