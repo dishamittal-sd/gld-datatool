@@ -115,8 +115,10 @@ export function WardOverview() {
             Early Years Foundation Stage (EYFS) baseline data across Manchester’s 32 wards.
           </p>
           <p>
-            Target thresholds for each Early Learning Goal and developmental milestone are set in
-            line with Manchester Local Authority priorities.
+            Collected at the start of the reception year in September 2026, this data establishes
+            the starting point for tracking progress toward Good Level of Development (GLD) targets
+            in July 2027. Target thresholds for each Early Learning Goal and developmental milestone
+            are set in line with Manchester Local Authority priorities.
           </p>
         </div>
       </div>
