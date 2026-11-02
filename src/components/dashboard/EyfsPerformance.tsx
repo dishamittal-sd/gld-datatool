@@ -110,6 +110,38 @@ export function EyfsPerformance() {
   );
 }
 
+type MetaItem = { icon: typeof Users; label: string; value: string };
+
+function MetaCards({ items }: { items: MetaItem[] }) {
+  return (
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {items.map((m) => (
+        <div key={m.label} className="flex items-center gap-3 rounded-md border border-border bg-secondary/40 px-3 py-2.5">
+          <m.icon className="size-4 text-primary" />
+          <div>
+            <p className="label-caps">{m.label}</p>
+            <p className="text-base font-bold">{m.value}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/** Synthetic ward aggregates built from the ward's sample schools. */
+function wardMeta(ward: WardRecord): MetaItem[] {
+  const cohort = ward.schools.reduce((n, s) => n + s.cohort, 0);
+  const send = ward.schools.filter((s) => s.send).length;
+  const weighted = (f: (s: SchoolRecord) => number) =>
+    Math.round(ward.schools.reduce((n, s) => n + f(s) * s.cohort, 0) / Math.max(1, cohort));
+  return [
+    { icon: Users, label: "Total Reception Cohort", value: `${cohort} children` },
+    { icon: Info, label: "Schools with Designated SEND Provision", value: `${send} of ${ward.schools.length} schools` },
+    { icon: Trophy, label: `${ward.name} GLD Baseline`, value: `${weighted((s) => s.gld)}%` },
+    { icon: CalendarCheck, label: "Pre-School Attendance", value: `${weighted((s) => s.kpis.preSchoolReady)}%` },
+  ];
+}
+
 function WardView({
   ward,
   onWard,
@@ -145,6 +177,8 @@ function WardView({
           </Select>
         </div>
       </div>
+
+      <MetaCards items={wardMeta(ward)} />
 
       <MilestoneCards kpis={ward.kpis} peers={wardRecords} peerLabel="wards" />
 
@@ -241,17 +275,7 @@ function SchoolView({
         </Button>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {meta.map((m) => (
-          <div key={m.label} className="flex items-center gap-3 rounded-md border border-border bg-secondary/40 px-3 py-2.5">
-            <m.icon className="size-4 text-primary" />
-            <div>
-              <p className="label-caps">{m.label}</p>
-              <p className="text-base font-bold">{m.value}</p>
-            </div>
-          </div>
-        ))}
-      </div>
+      <MetaCards items={meta} />
 
       <MilestoneCards kpis={school.kpis} peers={ward.schools} peerLabel={`schools in ${ward.name}`} milestones={GOAL_MILESTONES} />
 
