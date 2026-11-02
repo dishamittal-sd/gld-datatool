@@ -9,6 +9,9 @@ export const MILESTONES = [
 export type MilestoneKey = (typeof MILESTONES)[number]["key"];
 export type Milestones = Record<MilestoneKey, number>;
 
+/** Attendance is contextual information, not one of the assessed developmental goals. */
+export const GOAL_MILESTONES = MILESTONES.filter((m) => m.key !== "preSchoolReady");
+
 export type SchoolRecord = {
   id: string;
   name: string;
@@ -109,11 +112,14 @@ function generated(ward: string, count: number): SchoolRecord[] {
 
 export const wardRecords: WardRecord[] = MANCHESTER_WARDS.map(buildWard);
 
-/** Number of the 10 goals (7 EYFS areas + 3 milestones) at or above the benchmark target. */
+/** Number of the 9 goals (7 EYFS areas + 2 milestones) at or above the benchmark target. */
 export function goalsOnTarget(eyfs: EyfsScores, kpis: Milestones) {
-  return [...Object.values(eyfs), ...Object.values(kpis)].filter((v) => v >= TARGET).length;
+  return [
+    ...EYFS_AREAS.map((area) => eyfs[area] ?? 0),
+    ...GOAL_MILESTONES.map((m) => kpis[m.key]),
+  ].filter((v) => v >= TARGET).length;
 }
-export const TOTAL_GOALS = 10;
+export const TOTAL_GOALS = EYFS_AREAS.length + GOAL_MILESTONES.length;
 
 export function topNames<T extends { name: string }>(items: T[], score: (t: T) => number, n = 3) {
   return [...items].sort((a, b) => score(b) - score(a)).slice(0, n).map((i) => i.name);
