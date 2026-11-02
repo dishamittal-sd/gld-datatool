@@ -146,7 +146,9 @@ function WardView({
         </div>
       </div>
 
-      <MilestoneCards kpis={ward.kpis} peers={wardRecords} peerLabel="wards" />
+      <MilestoneCards kpis={ward.kpis} peers={wardRecords} peerLabel="wards" milestones={GOAL_MILESTONES} />
+
+      <NurseryAttendance value={ward.kpis.preSchoolReady} />
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <section className="min-w-0">
@@ -224,7 +226,6 @@ function SchoolView({
     { icon: Users, label: "Reception Cohort", value: `${school.cohort} children` },
     { icon: Info, label: "SEND Provision", value: school.send ? "Yes" : "No" },
     { icon: Trophy, label: "Schools GLD", value: `${school.gld}%` },
-    { icon: CalendarCheck, label: "Pre-School Attendance", value: `${school.kpis.preSchoolReady}%` },
   ];
   return (
     <div className="space-y-5">
@@ -254,6 +255,8 @@ function SchoolView({
       </div>
 
       <MilestoneCards kpis={school.kpis} peers={ward.schools} peerLabel={`schools in ${ward.name}`} milestones={GOAL_MILESTONES} />
+
+      <NurseryAttendance value={school.kpis.preSchoolReady} />
 
       <section>
         <h3 className="text-base font-semibold">Early Learning Goals</h3>
@@ -297,6 +300,22 @@ function MilestoneCards({ kpis, peers, peerLabel, milestones = MILESTONES }: {
             </UiTooltip>
           );
         })}
+      </div>
+    </section>
+  );
+}
+
+/** Neutral context: attendance is not an assessed goal, so no RAG colour or target wording. */
+function NurseryAttendance({ value }: { value: number }) {
+  return (
+    <section>
+      <h3 className="mb-2 text-base font-semibold">Nursery attendance</h3>
+      <div className="flex items-center gap-3 rounded-md border border-border bg-secondary/40 px-4 py-3">
+        <CalendarCheck className="size-4 text-primary" />
+        <div>
+          <p className="label-caps">Attended nursery</p>
+          <p className="text-2xl font-bold tabular-nums">{value}%</p>
+        </div>
       </div>
     </section>
   );
