@@ -1,5 +1,10 @@
+import { useState } from "react";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { TARGET, breakdown, ragOf, RAG_COLOR, type BreakdownRow, type Rag } from "@/data/dashboardData";
+import { DATA_PERIOD, TARGET, ragOf, RAG_COLOR, type BreakdownRow, type Rag } from "@/data/dashboardData";
+import { DEFAULT_CHARACTERISTICS_WARD, getCharacteristicsBreakdown } from "@/data/characteristicsData";
+import { MANCHESTER_WARDS } from "@/data/schoolsData";
 import { cn } from "@/lib/utils";
 
 const CELL_KEYS: { path: (r: BreakdownRow) => number; key: string; head: string }[] = [
@@ -20,13 +25,13 @@ const AREA_HEADERS: { label: string; span: number }[] = [
 
 /** Display labels for group keys. */
 const GROUP_LABELS: Record<string, string> = {
-  FSM: "Free School Meals",
   National: "Manchester overview",
 };
 
 /** Abbreviations that expand in a hover tooltip. */
 const TOOLTIP_LABELS: Record<string, string> = {
   EAL: "English as an Additional Language",
+  FSM: "Free School Meals",
   SEND: "Special Educational Needs and Disabilities",
 };
 
@@ -124,6 +129,9 @@ const HELPFUL_LINKS: { label: string; href: string }[] = [
 ];
 
 export function GlanceBreakdown() {
+  const [selectedWard, setSelectedWard] = useState(DEFAULT_CHARACTERISTICS_WARD);
+  const rows = getCharacteristicsBreakdown(selectedWard);
+
   return (
     <TooltipProvider delayDuration={150}>
       <div className="space-y-5">
@@ -131,7 +139,7 @@ export function GlanceBreakdown() {
           <h2 className="text-base font-semibold sm:text-lg">Characteristics view</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             This page provides a characteristics breakdown of key development milestones and Early
-            Years Foundation Stage (EYFS) baseline data for children in Gorton. It shows the
+            Years Foundation Stage (EYFS) baseline data for children in {selectedWard}. It shows the
             percentage of children reaching expected levels across different characteristics and
             Early Learning Goals.
           </p>
@@ -141,6 +149,28 @@ export function GlanceBreakdown() {
             July 2027. Target thresholds for each Early Learning Goal and developmental milestone are
             set in line with Manchester Local Authority priorities.
           </p>
+        </div>
+
+        <div className="flex flex-col gap-3 border-y border-primary/30 bg-primary/5 p-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <h2 className="text-lg font-semibold">Characteristics Breakdown - {selectedWard}</h2>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {DATA_PERIOD} · Synthetic sample data
+            </p>
+          </div>
+          <div className="flex min-w-0 flex-wrap items-center gap-2 sm:shrink-0">
+            <Label htmlFor="characteristics-ward" className="text-sm font-semibold">Select ward</Label>
+            <Select value={selectedWard} onValueChange={setSelectedWard}>
+              <SelectTrigger id="characteristics-ward" className="h-9 w-56 max-w-full rounded-sm bg-card">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="max-h-72">
+                {MANCHESTER_WARDS.map((ward) => (
+                  <SelectItem key={ward} value={ward}>{ward}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {/* RAG rating key */}
@@ -169,7 +199,7 @@ export function GlanceBreakdown() {
 
         {/* Desktop / tablet: matrix table */}
         <div className={cn("hidden overflow-x-auto rounded-md border bg-card sm:block", GRID)}>
-          <table className="w-full min-w-[900px] border-collapse text-sm">
+          <table aria-label={`Characteristics breakdown for ${selectedWard}`} className="w-full min-w-[900px] border-collapse text-sm">
             <thead>
               <tr className="bg-surface text-surface-foreground">
                 <th
@@ -179,7 +209,7 @@ export function GlanceBreakdown() {
                     GRID,
                   )}
                 >
-                  Group
+                  Characteristics
                 </th>
                 {AREA_HEADERS.map((a, ai) => (
                   <th
@@ -206,7 +236,7 @@ export function GlanceBreakdown() {
               </tr>
             </thead>
             <tbody>
-              {breakdown.map((row) => (
+              {rows.map((row) => (
                 <tr
                   key={row.group}
                   className={cn(
@@ -239,7 +269,7 @@ export function GlanceBreakdown() {
 
         {/* Mobile: one card per group, data-forward */}
         <div className="space-y-3 sm:hidden">
-          {breakdown.map((row) => (
+          {rows.map((row) => (
             <div
               key={row.group}
               className={cn(
@@ -277,9 +307,9 @@ export function GlanceBreakdown() {
 
         <div className="grid gap-5 lg:grid-cols-2">
           <section className="rounded-md border border-border bg-card p-4">
-            <h2 className="label-caps">Data summary</h2>
+            <h2 className="label-caps">Data summary - {selectedWard}</h2>
             <ul className="mt-3 space-y-2.5">
-              {buildSummaryBullets().map((msg, i) => (
+              {buildSummaryBullets(rows).map((msg, i) => (
                 <li key={i} className="flex gap-2.5 text-sm leading-relaxed">
                   <span className="mt-2 size-1.5 shrink-0 rounded-full bg-primary" />
                   <span>{msg}</span>
@@ -289,9 +319,9 @@ export function GlanceBreakdown() {
           </section>
 
           <section className="rounded-md border border-border bg-card p-4">
-            <h2 className="label-caps">Suggested next steps</h2>
+            <h2 className="label-caps">Suggested next steps - {selectedWard}</h2>
             <ul className="mt-3 space-y-2.5">
-              {buildNextSteps().map((step, i) => (
+              {buildNextSteps(rows).map((step, i) => (
                 <li key={i} className="flex gap-2.5 text-sm leading-relaxed">
                   <span className="mt-1.5 size-1.5 shrink-0 rotate-45 border border-primary" />
                   <span>{step}</span>
@@ -327,14 +357,15 @@ function avg(row: BreakdownRow) {
   return Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
 }
 
-function buildSummaryBullets(): string[] {
-  const byGroup = Object.fromEntries(breakdown.map((r) => [r.group, r]));
-  const boy = byGroup["Boy"]!;
-  const girl = byGroup["Girl"]!;
-  const nat = byGroup["National"]!;
-  const send = byGroup["SEND"]!;
-  const eal = byGroup["EAL"]!;
-  const fsm = byGroup["FSM"]!;
+function buildSummaryBullets(rows: BreakdownRow[]): string[] {
+  const byGroup = Object.fromEntries(rows.map((r) => [r.group, r]));
+  const boy = byGroup["Boy"];
+  const girl = byGroup["Girl"];
+  const nat = byGroup["National"];
+  const send = byGroup["SEND"];
+  const eal = byGroup["EAL"];
+  const fsm = byGroup["FSM"];
+  if (!boy || !girl || !nat || !send || !eal || !fsm) return [];
 
   const boyAvg = avg(boy);
   const girlAvg = avg(girl);
@@ -350,22 +381,24 @@ function buildSummaryBullets(): string[] {
   );
 
   return [
+    "Interconnecting characteristics compound impact: children with multiple overlapping barriers experience significantly wider attainment gaps.",
     `Girls outperform boys on six of the seven early learning goals — Listening & Attention (${girl.cll.LA}% vs ${boy.cll.LA}%), Speaking (${girl.cll.S}% vs ${boy.cll.S}%), Self-Regulation (${girl.pse.SR}% vs ${boy.pse.SR}%), Managing Self (${girl.pse.MS}% vs ${boy.pse.MS}%), Building Relationships (${girl.pse.BR}% vs ${boy.pse.BR}%) and Fine Motor Skills (${girl.pd.FM}% vs ${boy.pd.FM}%) — an overall gap of ${gap} points (${girlAvg}% vs ${boyAvg}%).`,
     `Boys outperform girls only in Gross Motor Skills (${boy.pd.GM}% vs ${girl.pd.GM}%); the widest gender gap is ${widestGap} points.`,
     `Children with SEND show the widest inequality at ${avg(send)}% overall — ${natAvg - avg(send)} points behind the Manchester overview.`,
     `Children with EAL track closer to the Manchester overview at ${avg(eal)}%, but their language outcomes (Listening & Attention ${eal.cll.LA}%, Speaking ${eal.cll.S}%) remain a priority for targeted support.`,
-    `Children facing combined barriers need the most joined-up support: both children on Free School Meals (${avg(fsm)}% overall) and children with EAL (${avg(eal)}%) sit well below the Manchester overview (${natAvg}%), and where the two overlap — for example in Communication & Language (Free School Meals ${fsm.cll.LA}%, EAL ${eal.cll.LA}%) — the gaps add up, so these children benefit most when language and family support are planned together.`,
+    `Children on Free School Meals (${avg(fsm)}%) and children with EAL (${avg(eal)}%) are below the Manchester overview (${natAvg}%). Plan language and family support together for children facing both barriers.`,
     `Physical Development — Gross Motor is the strongest area across every group.`,
   ];
 }
 
-function buildNextSteps(): string[] {
-  const byGroup = Object.fromEntries(breakdown.map((r) => [r.group, r]));
-  const boy = byGroup["Boy"]!;
-  const girl = byGroup["Girl"]!;
-  const nat = byGroup["National"]!;
-  const send = byGroup["SEND"]!;
-  const eal = byGroup["EAL"]!;
+function buildNextSteps(rows: BreakdownRow[]): string[] {
+  const byGroup = Object.fromEntries(rows.map((r) => [r.group, r]));
+  const boy = byGroup["Boy"];
+  const girl = byGroup["Girl"];
+  const nat = byGroup["National"];
+  const send = byGroup["SEND"];
+  const eal = byGroup["EAL"];
+  if (!boy || !girl || !nat || !send || !eal) return [];
 
   const natAvg = avg(nat);
 

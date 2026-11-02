@@ -21,3 +21,4 @@
   the figure size, so shrinking a figure without deepening its ink fails.
 - Schools view goal counting and individual-school milestone cards share the assessed milestone list in the data module, keeping contextual school information out of goal totals.
 - The shared Schools ELG chart accepts an explicit target-visibility option so overview and individual-school presentations can differ without changing the benchmark calculation.
+- Characteristics view uses the Schools view's Manchester ward catalogue and a dedicated deterministic sample-data module; summaries derive from the selected ward rows so context and figures stay in sync.
