@@ -257,7 +257,7 @@ function SchoolView({
 
       <section>
         <h3 className="text-base font-semibold">Early Learning Goals</h3>
-        <ElgChart eyfs={school.eyfs} peers={ward.schools} peerLabel={`schools in ${ward.name}`} />
+        <ElgChart eyfs={school.eyfs} peers={ward.schools} peerLabel={`schools in ${ward.name}`} showTarget={false} />
       </section>
     </div>
   );
