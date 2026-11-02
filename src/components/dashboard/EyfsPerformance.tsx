@@ -180,7 +180,7 @@ function WardView({
 
       <MetaCards items={wardMeta(ward)} />
 
-      <MilestoneCards kpis={ward.kpis} peers={wardRecords} peerLabel="wards" />
+      <MilestoneCards kpis={ward.kpis} peers={wardRecords} peerLabel="wards" milestones={GOAL_MILESTONES} />
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <section className="min-w-0">
