@@ -7,7 +7,7 @@
 
 ## Characteristics view updates
 
-- [ ] Add the Schools-style selector for all 32 wards, defaulting to Gorton, with ward-specific headings and sample figures.
-- [ ] Rename the first column and add EAL, FSM and SEND definition tooltips.
-- [ ] Add the opening overlapping-barriers summary and simplify the existing combined-barriers bullet.
-- [ ] Test ward selection data and verify switching wards and tooltips in the page.
+- [x] Add the Schools-style selector for all 32 wards, defaulting to Gorton, with ward-specific headings and sample figures.
+- [x] Rename the first column and add EAL, FSM and SEND definition tooltips.
+- [x] Add the opening overlapping-barriers summary and simplify the existing combined-barriers bullet.
+- [x] Test ward selection data and verify switching wards and tooltips in the page.
