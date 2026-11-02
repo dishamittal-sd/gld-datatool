@@ -67,7 +67,7 @@ export function combinationResult(ward: string, rows: BreakdownRow[], selected: 
   // Each additional overlapping barrier deepens the gap beyond the sum of single effects.
   const compound = barriers > 1 ? (barriers - 1) * 3 : 0;
   const goals = Object.fromEntries(GOAL_KEYS.map((k, i) => {
-    const shift = selected.reduce((s, c) => s + EFFECT[c][i], 0);
+    const shift = selected.reduce((s, c) => s + (EFFECT[c][i] ?? 0), 0);
     return [k, Math.max(5, Math.min(98, Math.round(base[k] + shift - compound)))];
   })) as Record<GoalKey, number>;
   const overlap = barriers > 1 ? 1 + 0.25 * (barriers - 1) : 1;
