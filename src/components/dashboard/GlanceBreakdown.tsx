@@ -381,7 +381,7 @@ function buildSummaryBullets(rows: BreakdownRow[]): string[] {
   );
 
   return [
-    "Interconnecting characteristics compound impact: children with multiple overlapping barriers experience significantly wider attainment gaps.",
+    "Interconnecting characteristics compound impact: gender, eligibility for Free School Meals (FSM), English as an Additional Language (EAL), and Special Educational Needs and Disabilities (SEND) can overlap. Children with multiple overlapping barriers experience significantly wider attainment gaps.",
     `Girls outperform boys on six of the seven early learning goals — Listening & Attention (${girl.cll.LA}% vs ${boy.cll.LA}%), Speaking (${girl.cll.S}% vs ${boy.cll.S}%), Self-Regulation (${girl.pse.SR}% vs ${boy.pse.SR}%), Managing Self (${girl.pse.MS}% vs ${boy.pse.MS}%), Building Relationships (${girl.pse.BR}% vs ${boy.pse.BR}%) and Fine Motor Skills (${girl.pd.FM}% vs ${boy.pd.FM}%) — an overall gap of ${gap} points (${girlAvg}% vs ${boyAvg}%).`,
     `Boys outperform girls only in Gross Motor Skills (${boy.pd.GM}% vs ${girl.pd.GM}%); the widest gender gap is ${widestGap} points.`,
     `Children with SEND show the widest inequality at ${avg(send)}% overall — ${natAvg - avg(send)} points behind the Manchester overview.`,
