@@ -6,6 +6,7 @@ import { DATA_PERIOD, TARGET, ragOf, RAG_COLOR, type BreakdownRow, type Rag } fr
 import { DEFAULT_CHARACTERISTICS_WARD, getCharacteristicsBreakdown } from "@/data/characteristicsData";
 import { MANCHESTER_WARDS } from "@/data/schoolsData";
 import { cn } from "@/lib/utils";
+import { CombinationExplorer } from "@/components/dashboard/CombinationExplorer";
 
 const CELL_KEYS: { path: (r: BreakdownRow) => number; key: string; head: string }[] = [
   { key: "cll-LA", head: "Listening & Attention", path: (r) => r.cll.LA },
@@ -304,6 +305,8 @@ export function GlanceBreakdown() {
             </div>
           ))}
         </div>
+
+        <CombinationExplorer ward={selectedWard} rows={rows} />
 
         <div className="grid gap-5 lg:grid-cols-2">
           <section className="rounded-md border border-border bg-card p-4">
