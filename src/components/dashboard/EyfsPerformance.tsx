@@ -11,7 +11,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { ArrowLeft, ChevronRight, Info, MousePointerClick, School, Trophy, Users } from "lucide-react";
+import { ArrowLeft, CalendarCheck, ChevronRight, Info, MousePointerClick, School, Trophy, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -26,6 +26,7 @@ import {
 import { DATA_PERIOD, RAG_COLOR, TARGET, ragLabel, ragOf, type EyfsScores } from "@/data/dashboardData";
 import {
   DEFAULT_WARD_ID,
+  GOAL_MILESTONES,
   MILESTONES,
   TOTAL_GOALS,
   goalsOnTarget,
@@ -48,7 +49,8 @@ type Peer = { name: string; eyfs: EyfsScores; kpis: Milestones };
 export function EyfsPerformance() {
   const [wardId, setWardId] = useState(DEFAULT_WARD_ID);
   const [schoolId, setSchoolId] = useState<string | null>(null);
-  const ward = wardRecords.find((w) => w.id === wardId)!;
+  const ward = wardRecords.find((w) => w.id === wardId) ?? wardRecords[0];
+  if (!ward) return null;
   const school = ward.schools.find((s) => s.id === schoolId) ?? null;
 
   return (
@@ -162,6 +164,7 @@ function WardView({
             previous={show2025 ? ward.eyfs2025 : undefined}
             peers={wardRecords}
             peerLabel="wards"
+            showTarget={false}
           />
         </section>
 
@@ -169,6 +172,9 @@ function WardView({
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <h3 className="text-base font-semibold">Schools in {ward.name}</h3>
           </div>
+          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+            Number of Early Learning Goals and Developmental Milestones currently meeting or exceeding the agreed threshold.
+          </p>
           <p className="mt-2 inline-flex items-center gap-1.5 rounded-sm border border-primary/40 bg-primary/10 px-2 py-1 text-xs font-semibold text-primary">
             <MousePointerClick className="size-3.5" />
             Click a school to view individual performance
@@ -218,6 +224,7 @@ function SchoolView({
     { icon: Users, label: "Reception Cohort", value: `${school.cohort} children` },
     { icon: Info, label: "SEND Provision", value: school.send ? "Yes" : "No" },
     { icon: Trophy, label: "Schools GLD", value: `${school.gld}%` },
+    { icon: CalendarCheck, label: "Pre-School Attendance", value: `${school.kpis.preSchoolReady}%` },
   ];
   return (
     <div className="space-y-5">
@@ -234,7 +241,7 @@ function SchoolView({
         </Button>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {meta.map((m) => (
           <div key={m.label} className="flex items-center gap-3 rounded-md border border-border bg-secondary/40 px-3 py-2.5">
             <m.icon className="size-4 text-primary" />
@@ -246,7 +253,7 @@ function SchoolView({
         ))}
       </div>
 
-      <MilestoneCards kpis={school.kpis} peers={ward.schools} peerLabel={`schools in ${ward.name}`} />
+      <MilestoneCards kpis={school.kpis} peers={ward.schools} peerLabel={`schools in ${ward.name}`} milestones={GOAL_MILESTONES} />
 
       <section>
         <h3 className="text-base font-semibold">Early Learning Goals</h3>
@@ -256,12 +263,17 @@ function SchoolView({
   );
 }
 
-function MilestoneCards({ kpis, peers, peerLabel }: { kpis: Milestones; peers: Peer[]; peerLabel: string }) {
+function MilestoneCards({ kpis, peers, peerLabel, milestones = MILESTONES }: {
+  kpis: Milestones;
+  peers: Peer[];
+  peerLabel: string;
+  milestones?: readonly (typeof MILESTONES)[number][];
+}) {
   return (
     <section>
       <h3 className="mb-2 text-base font-semibold">Key Developmental Milestones</h3>
-      <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-3">
-        {MILESTONES.map((m) => {
+      <div className={cn("grid gap-px overflow-hidden rounded-md border border-border bg-border", milestones.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-3")}>
+        {milestones.map((m) => {
           const v = kpis[m.key];
           const top = topNames(peers, (p) => p.kpis[m.key]);
           return (
@@ -308,11 +320,13 @@ function ElgChart({
   previous,
   peers,
   peerLabel,
+  showTarget = true,
 }: {
   eyfs: EyfsScores;
   previous?: EyfsScores | undefined;
   peers: Peer[];
   peerLabel: string;
+  showTarget?: boolean;
 }) {
   const isMobile = useIsMobile();
   const data = useMemo(
@@ -332,10 +346,12 @@ function ElgChart({
             2025
           </span>
         )}
-        <span className="inline-flex items-center gap-1.5">
-          <span className="w-4 border-t border-dashed border-foreground/60" />
-          Target {TARGET}%
-        </span>
+        {showTarget && (
+          <span className="inline-flex items-center gap-1.5">
+            <span className="w-4 border-t border-dashed border-foreground/60" />
+            Target {TARGET}%
+          </span>
+        )}
       </div>
       <div className={previous ? "h-[460px]" : "h-[360px]"}>
         <ResponsiveContainer width="100%" height="100%">
@@ -368,7 +384,7 @@ function ElgChart({
                 ) : null
               }
             />
-            <ReferenceLine x={TARGET} stroke="var(--foreground)" strokeOpacity={0.45} strokeDasharray="4 3" />
+            {showTarget && <ReferenceLine x={TARGET} stroke="var(--foreground)" strokeOpacity={0.45} strokeDasharray="4 3" />}
             {previous && (
               <Bar dataKey="prev" name="2025" fill="var(--muted-foreground)" fillOpacity={0.4} radius={[0, 2, 2, 0]} maxBarSize={14}>
                 <LabelList dataKey="prev" position="right" formatter={(v: number) => `${v}%`} style={{ fontSize: 10, fill: "var(--muted-foreground)" }} />
