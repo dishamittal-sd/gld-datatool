@@ -178,7 +178,7 @@ export function WardOverview() {
                 <ChevronDown className="size-4 opacity-70" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent align="end" className="w-60 rounded-sm p-1">
+            <PopoverContent align="end" className="max-h-96 w-60 overflow-y-auto rounded-sm p-1">
               <div className="flex items-center justify-between px-2.5 py-1.5 text-xs text-muted-foreground">
                 <span className="font-medium text-foreground">{PRIMARY_WARD}</span>
                 <span className="label-caps">always shown</span>
