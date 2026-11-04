@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { WardOverview } from "@/components/dashboard/WardOverview";
@@ -34,6 +35,7 @@ const TABS = [
 ];
 
 function Index() {
+  const [tab, setTab] = useState("ward");
   return (
     <div className="min-h-screen bg-background">
       <header className="bg-surface text-surface-foreground">
@@ -50,7 +52,7 @@ function Index() {
         </div>
       </header>
 
-      <Tabs defaultValue="ward">
+      <Tabs value={tab} onValueChange={setTab}>
         <div className="border-b border-border bg-card">
           <div className="mx-auto max-w-[1400px] px-4 sm:px-6">
             <TabsList className="h-auto w-full justify-start gap-6 overflow-x-auto rounded-none bg-transparent p-0 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -69,7 +71,7 @@ function Index() {
 
         <main className="mx-auto max-w-[1400px] px-4 py-5 sm:px-6 sm:py-7">
           <TabsContent value="ward" className="mt-0">
-            <WardOverview />
+            <WardOverview onExploreCharacteristics={() => setTab("glance")} />
           </TabsContent>
           <TabsContent value="glance" className="mt-0">
             <GlanceBreakdown />
