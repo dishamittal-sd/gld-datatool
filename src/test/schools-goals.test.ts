@@ -15,7 +15,7 @@ describe("Schools view assessed goals", () => {
     })).toBe(9);
   });
 
-  it("excludes pre-school attendance from assessed milestones and the goal count", () => {
+  it("excludes early years provision attendance from assessed milestones and the goal count", () => {
     expect(GOAL_MILESTONES.map((milestone) => milestone.key)).toEqual([
       "toiletTrained", "feedIndependently",
     ]);
