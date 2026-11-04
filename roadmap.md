@@ -1,13 +1,9 @@
-# Schools view updates
+# Ward view updates (uploaded brief)
 
-- [x] Count nine assessed goals, excluding pre-school attendance, and add the requested subtitle.
-- [x] Remove the target line from Schools ward overview charts only.
-- [x] Move individual school attendance to neutral school details.
-- [x] Test goal rules and verify overview-to-school navigation and chart states.
-
-## Characteristics view updates
-
-- [x] Add the Schools-style selector for all 32 wards, defaulting to Gorton, with ward-specific headings and sample figures.
-- [x] Rename the first column and add EAL, FSM and SEND definition tooltips.
-- [x] Add the opening overlapping-barriers summary and simplify the existing combined-barriers bullet.
-- [x] Test ward selection data and verify switching wards and tooltips in the page.
+- [ ] Replace intro copy with the new three-paragraph text incl. Birth to 5 Matters and national EYFSP link.
+- [ ] Add Total Reception Cohort card that updates with active wards.
+- [ ] Default charts to Manchester Figure + Gorton only; all 32 wards selectable, none pre-selected.
+- [ ] Add "Show 2025 Data" toggle overlaying mock 2025 bars on the six main charts.
+- [ ] Key messages: add Characteristics View pointer, "goals" not "metrics", spell out acronyms.
+- [ ] Global: rename Pre-School/Nursery Attendance to "Attended an early years provision" everywhere.
+- [ ] Update tests, run them, verify in preview.
