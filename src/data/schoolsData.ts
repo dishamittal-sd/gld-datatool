@@ -1,5 +1,5 @@
 /** Synthetic Schools view data: all 32 Manchester wards and their schools. Mock figures only. */
-import { EYFS_AREAS, MANCHESTER_WARDS, TARGET, manchester, type EyfsScores } from "@/data/dashboardData";
+import { EYFS_AREAS, MANCHESTER_WARDS, TARGET, manchester, wardCohort, type EyfsScores } from "@/data/dashboardData";
 
 export { MANCHESTER_WARDS };
 
