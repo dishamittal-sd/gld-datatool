@@ -638,27 +638,30 @@ function buildKeyMessages(selected: WardName[]): string[] {
   const aboveTarget = METRICS.filter((m) => gorton[m.key] >= TARGET);
   const strongest = [...METRICS].sort((a, b) => gorton[b.key] - gorton[a.key])[0]!;
   messages.push(
-    `${PRIMARY_WARD} meets or exceeds the ${TARGET}% benchmark target in ${aboveTarget.length} of ${METRICS.length} metrics, performing best in ${strongest.full} (${gorton[strongest.key]}%).`,
+    `${PRIMARY_WARD} meets or exceeds the ${TARGET}% benchmark target in ${aboveTarget.length} of ${METRICS.length} goals, performing best in ${strongest.full} (${gorton[strongest.key]}%).`,
   );
 
   const aboveMcr = METRICS.filter((m) => gorton[m.key] >= manchesterAverage[m.key]);
   messages.push(
-    `Against the Manchester figure, ${PRIMARY_WARD} is level or ahead in ${aboveMcr.length} of ${METRICS.length} metrics${
-      aboveMcr.length ? ` (${formatList(aboveMcr.map((m) => m.label))})` : ""
+    `Against the Manchester figure, ${PRIMARY_WARD} is level or ahead in ${aboveMcr.length} of ${METRICS.length} goals${
+      aboveMcr.length ? ` (${formatList(aboveMcr.map((m) => m.full))})` : ""
     }.`,
   );
 
-  if (!selected.length) {
+  if (selected.length) {
+    const wins = METRICS.filter((m) => selected.every((w) => gorton[m.key] > wardPerformance[w][m.key]));
+    const losses = METRICS.filter((m) => selected.every((w) => gorton[m.key] < wardPerformance[w][m.key]));
+    messages.push(
+      `Compared with ${formatList(selected)}, ${PRIMARY_WARD} leads on ${
+        wins.length ? formatList(wins.map((m) => m.full)) : "no goal"
+      } and trails on ${losses.length ? formatList(losses.map((m) => m.full)) : "no goal"}.`,
+    );
+  } else {
     messages.push("Select one or more comparison wards to benchmark Gorton against other wards.");
-    return messages;
   }
 
-  const wins = METRICS.filter((m) => selected.every((w) => gorton[m.key] > wardPerformance[w][m.key]));
-  const losses = METRICS.filter((m) => selected.every((w) => gorton[m.key] < wardPerformance[w][m.key]));
   messages.push(
-    `Compared with ${formatList(selected)}, ${PRIMARY_WARD} leads on ${
-      wins.length ? formatList(wins.map((m) => m.label)) : "no metric"
-    } and trails on ${losses.length ? formatList(losses.map((m) => m.label)) : "no metric"}.`,
+    "For detailed breakdowns by pupil characteristics and interconnecting characteristics, explore the Characteristics View tab.",
   );
   return messages;
 }
