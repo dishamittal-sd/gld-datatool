@@ -9,10 +9,12 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { CalendarDays, Check, ChevronDown, MousePointerClick, SlidersHorizontal } from "lucide-react";
+import { CalendarDays, Check, ChevronDown, MousePointerClick, SlidersHorizontal, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Switch } from "@/components/ui/switch";
 import {
   Sheet,
   SheetContent,
@@ -32,8 +34,11 @@ import {
   TARGET,
   WARDS,
   manchesterAverage,
+  manchesterAverage2025,
   subItemScore,
+  wardCohort,
   wardPerformance,
+  wardPerformance2025,
   type MetricKey,
   type WardName,
 } from "@/data/dashboardData";
@@ -80,9 +85,10 @@ const tooltipStyle = {
 };
 
 export function WardOverview() {
-  const [selected, setSelected] = useState<WardName[]>(["Levenshulme", "Cheetham"]);
+  const [selected, setSelected] = useState<WardName[]>([]);
   const [focusWard, setFocusWard] = useState<WardName>(PRIMARY_WARD as WardName);
   const [openMetric, setOpenMetric] = useState<MetricKey | null>(null);
+  const [show2025, setShow2025] = useState(false);
 
   const wards = useMemo<WardName[]>(
     () => [PRIMARY_WARD as WardName, ...WARDS.filter((w) => selected.includes(w))],
@@ -97,6 +103,8 @@ export function WardOverview() {
     });
 
   const keyMessages = useMemo(() => buildKeyMessages(selected), [selected]);
+
+  const cohortTotal = useMemo(() => wards.reduce((sum, w) => sum + (wardCohort[w] ?? 0), 0), [wards]);
 
   return (
     <div className="space-y-6">
