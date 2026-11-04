@@ -317,14 +317,14 @@ function MetricChart({
       [MANCHESTER_LABEL]: manchesterAverage[metricKey],
       ...(show2025
         ? {
-            ...Object.fromEntries(wards.map((w) => [`${w} 2025`, wardPerformance2025[w][metricKey]])),
+            ...Object.fromEntries(wards.map((w) => [`${w} 2025`, wardPerformance2025[w]![metricKey]])),
             [`${MANCHESTER_LABEL} 2025`]: manchesterAverage2025[metricKey],
           }
         : {}),
     },
   ];
   const bars = show2025 ? series.flatMap((s) => [s, `${s} 2025`]) : series;
-  const primaryValue = wardPerformance[PRIMARY_WARD as WardName][metricKey];
+  const primaryValue = wardPerformance[PRIMARY_WARD as WardName]![metricKey];
   const delta = primaryValue - TARGET;
   const pid = usePatternId();
 
@@ -470,7 +470,7 @@ function SubItemChart({ metricKey, ward }: { metricKey: MetricKey; ward: WardNam
   const data = items.map((it) => ({
     name: it.name,
     [MANCHESTER_LABEL]: subItemScore(manchesterAverage[metricKey], it.offset),
-    [ward]: subItemScore(wardPerformance[ward][metricKey], it.offset),
+    [ward]: subItemScore(wardPerformance[ward]![metricKey], it.offset),
   }));
   const pid = usePatternId();
 
@@ -649,8 +649,8 @@ function buildKeyMessages(selected: WardName[]): string[] {
   );
 
   if (selected.length) {
-    const wins = METRICS.filter((m) => selected.every((w) => gorton[m.key] > wardPerformance[w][m.key]));
-    const losses = METRICS.filter((m) => selected.every((w) => gorton[m.key] < wardPerformance[w][m.key]));
+    const wins = METRICS.filter((m) => selected.every((w) => gorton[m.key] > wardPerformance[w]![m.key]));
+    const losses = METRICS.filter((m) => selected.every((w) => gorton[m.key] < wardPerformance[w]![m.key]));
     messages.push(
       `Compared with ${formatList(selected)}, ${PRIMARY_WARD} leads on ${
         wins.length ? formatList(wins.map((m) => m.full)) : "no goal"
