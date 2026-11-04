@@ -24,7 +24,7 @@ export function CombinationExplorer({ ward, rows }: { ward: string; rows: Breakd
   const data = GOAL_KEYS.map((k) => ({
     goal: GOAL_LABELS[k],
     [MANCHESTER_LABEL]: mcr[k],
-    [`${ward} average`]: wardAvg[k],
+    [`${ward} figure`]: wardAvg[k],
     [label || "Cohort"]: result?.goals[k] ?? 0,
   }));
 
@@ -105,7 +105,7 @@ export function CombinationExplorer({ ward, rows }: { ward: string; rows: Breakd
                 <Tooltip formatter={(v) => `${v}%`} />
                 <Legend verticalAlign="top" wrapperStyle={{ fontSize: 12 }} />
                 <Bar dataKey={MANCHESTER_LABEL} fill="url(#combo-mcr-stripes)" stroke={MCR} />
-                <Bar dataKey={`${ward} average`} fill="var(--muted-foreground)" />
+                <Bar dataKey={`${ward} figure`} fill="var(--muted-foreground)" />
                 <Bar dataKey={label} fill="var(--primary)" />
               </BarChart>
             </ResponsiveContainer>
