@@ -160,7 +160,13 @@ export function WardOverview() {
           ))}
         </div>
 
-        <div className="flex shrink-0 flex-wrap items-center gap-2 sm:justify-end">
+        <div className="flex shrink-0 flex-wrap items-center gap-3 sm:justify-end">
+          <div className="flex items-center gap-2">
+            <Switch id="ward-show-2025" checked={show2025} onCheckedChange={setShow2025} />
+            <Label htmlFor="ward-show-2025" className="text-xs font-medium">
+              Show 2025 Data
+            </Label>
+          </div>
           <p className="flex items-center gap-1.5 text-sm font-semibold">
             <SlidersHorizontal className="size-4 text-primary" />
             Select wards to compare
@@ -201,6 +207,7 @@ export function WardOverview() {
         hint="Click a chart to see its sub-item breakdown"
         keys={ELG_KEYS}
         wards={wards}
+        show2025={show2025}
         onOpen={setOpenMetric}
       />
       <ChartSection
@@ -208,6 +215,7 @@ export function WardOverview() {
         hint="Click a chart to see correlated Early Learning Goals"
         keys={MILESTONE_KEYS}
         wards={wards}
+        show2025={show2025}
         onOpen={setOpenMetric}
       />
 
