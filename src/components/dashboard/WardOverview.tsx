@@ -158,6 +158,7 @@ export function WardOverview({ onExploreCharacteristics }: { onExploreCharacteri
       {/* Ward selection */}
       <div className="flex flex-col gap-3 rounded-md border border-primary/30 bg-primary/5 p-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+          <Chip label={PRIMARY_WARD} focus />
           <Chip label={MANCHESTER_LABEL} primary />
           {wards.map((ward) => (
             <Chip key={ward} label={ward} />
@@ -276,16 +277,22 @@ export function WardOverview({ onExploreCharacteristics }: { onExploreCharacteri
   );
 }
 
-function Chip({ label, primary }: { label: string; primary?: boolean }) {
+function Chip({ label, primary, focus }: { label: string; primary?: boolean; focus?: boolean }) {
   return (
     <span
       className={cn(
         "inline-flex items-center gap-1.5 rounded-sm border border-border bg-card px-2 py-0.5 text-xs font-medium",
         primary && "border-primary/40",
+        focus && "border-primary bg-primary font-semibold text-primary-foreground",
       )}
     >
       <span className="size-2.5 rounded-full" style={swatch(label)} />
       {label}
+      {focus && (
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-primary-foreground/75">
+          in focus
+        </span>
+      )}
       {primary && (
         <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
           primary
