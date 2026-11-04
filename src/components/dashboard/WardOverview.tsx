@@ -84,7 +84,7 @@ const tooltipStyle = {
   fontSize: 12,
 };
 
-export function WardOverview() {
+export function WardOverview({ onExploreCharacteristics }: { onExploreCharacteristics?: () => void }) {
   const [selected, setSelected] = useState<WardName[]>([]);
   const [focusWard, setFocusWard] = useState<WardName>(PRIMARY_WARD as WardName);
   const [openMetric, setOpenMetric] = useState<MetricKey | null>(null);
@@ -205,6 +205,21 @@ export function WardOverview() {
       <ChartSection
         title="Early Learning Goals"
         hint="Click a chart to see its sub-item breakdown"
+        footnote={
+          onExploreCharacteristics && (
+            <p className="text-xs text-muted-foreground">
+              For detailed breakdowns by pupil characteristics{" "}
+              <button
+                type="button"
+                onClick={onExploreCharacteristics}
+                className="font-medium text-primary underline underline-offset-2 transition-colors hover:opacity-80"
+              >
+                explore the Characteristics View tab
+              </button>
+              .
+            </p>
+          )
+        }
         keys={ELG_KEYS}
         wards={wards}
         show2025={show2025}
@@ -264,6 +279,7 @@ function Chip({ label, primary }: { label: string; primary?: boolean }) {
 function ChartSection({
   title,
   hint,
+  footnote,
   keys,
   wards,
   show2025,
@@ -271,6 +287,7 @@ function ChartSection({
 }: {
   title: string;
   hint: string;
+  footnote?: React.ReactNode;
   keys: MetricKey[];
   wards: WardName[];
   show2025: boolean;
@@ -285,6 +302,7 @@ function ChartSection({
           {hint}
         </p>
       </div>
+      {footnote}
       <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2 xl:grid-cols-3">
         {keys.map((k) => (
           <MetricChart key={k} metricKey={k} wards={wards} show2025={show2025} onOpen={() => onOpen(k)} />
