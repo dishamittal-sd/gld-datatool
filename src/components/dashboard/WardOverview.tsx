@@ -228,6 +228,21 @@ export function WardOverview({ onExploreCharacteristics }: { onExploreCharacteri
       <ChartSection
         title="Key Development Milestones"
         hint="Click a chart to see correlated Early Learning Goals"
+        footnote={
+          onExploreCharacteristics && (
+            <p className="text-xs text-muted-foreground">
+              For detailed breakdowns by pupil characteristics{" "}
+              <button
+                type="button"
+                onClick={onExploreCharacteristics}
+                className="font-medium text-primary underline underline-offset-2 transition-colors hover:opacity-80"
+              >
+                explore the Characteristics View tab
+              </button>
+              .
+            </p>
+          )
+        }
         keys={MILESTONE_KEYS}
         wards={wards}
         show2025={show2025}
