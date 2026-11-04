@@ -73,6 +73,14 @@ function buildWard(name: string): WardRecord {
   } else {
     schools = generated(name, 3 + Math.floor(rng(name)() * 3));
   }
+  // Alinha o somatório dos cohorts das escolas ao cohort do ward usado na Ward view.
+  const target = wardCohort[name as keyof typeof wardCohort] ?? 0;
+  const total = schools.reduce((n, s) => n + s.cohort, 0);
+  if (target > 0 && total > 0) {
+    const scaled = schools.map((s) => Math.max(10, Math.round((s.cohort / total) * target)));
+    scaled[scaled.length - 1] = Math.max(10, target - scaled.slice(0, -1).reduce((a, b) => a + b, 0));
+    schools.forEach((s, i) => { s.cohort = scaled[i]!; });
+  }
   const eyfs: EyfsScores = area
     ? area.eyfs
     : Object.fromEntries(EYFS_AREAS.map((a) => [a, avg(schools.map((s) => s.eyfs[a]!))]));
