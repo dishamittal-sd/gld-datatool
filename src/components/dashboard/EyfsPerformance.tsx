@@ -138,7 +138,7 @@ function wardMeta(ward: WardRecord): MetaItem[] {
     { icon: Users, label: "Total Reception Cohort", value: `${cohort} children` },
     { icon: Info, label: "Schools with Designated SEND Provision", value: `${send} of ${ward.schools.length} schools` },
     { icon: Trophy, label: `${ward.name} GLD Baseline`, value: `${weighted((s) => s.gld)}%` },
-    { icon: CalendarCheck, label: "Pre-School Attendance", value: `${weighted((s) => s.kpis.preSchoolReady)}%` },
+    { icon: CalendarCheck, label: "Attended an early years provision", value: `${weighted((s) => s.kpis.preSchoolReady)}%` },
   ];
 }
 
@@ -257,7 +257,7 @@ function SchoolView({
     { icon: Users, label: "Reception Cohort", value: `${school.cohort} children` },
     { icon: Info, label: "SEND Provision", value: school.send ? "Yes" : "No" },
     { icon: Trophy, label: "Schools GLD", value: `${school.gld}%` },
-    { icon: CalendarCheck, label: "Pre-School Attendance", value: `${school.kpis.preSchoolReady}%` },
+    { icon: CalendarCheck, label: "Attended an early years provision", value: `${school.kpis.preSchoolReady}%` },
   ];
   return (
     <div className="space-y-5">
