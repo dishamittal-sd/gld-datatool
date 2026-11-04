@@ -313,7 +313,7 @@ function MetricChart({
   const data = [
     {
       name: metric.label,
-      ...Object.fromEntries(wards.map((w) => [w, wardPerformance[w][metricKey]])),
+      ...Object.fromEntries(wards.map((w) => [w, wardPerformance[w]![metricKey]])),
       [MANCHESTER_LABEL]: manchesterAverage[metricKey],
       ...(show2025
         ? {
