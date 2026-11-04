@@ -160,7 +160,7 @@ export function WardOverview({ onExploreCharacteristics }: { onExploreCharacteri
         <div className="flex min-w-0 flex-wrap items-center gap-1.5">
           <Chip label={PRIMARY_WARD} focus />
           <Chip label={MANCHESTER_LABEL} primary />
-          {wards.map((ward) => (
+          {wards.filter((w) => w !== PRIMARY_WARD).map((ward) => (
             <Chip key={ward} label={ward} />
           ))}
         </div>
