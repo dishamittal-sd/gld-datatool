@@ -300,10 +300,12 @@ function ChartSection({
 function MetricChart({
   metricKey,
   wards,
+  show2025,
   onOpen,
 }: {
   metricKey: MetricKey;
   wards: WardName[];
+  show2025: boolean;
   onOpen: () => void;
 }) {
   const metric = METRICS.find((m) => m.key === metricKey)!;
@@ -313,8 +315,15 @@ function MetricChart({
       name: metric.label,
       ...Object.fromEntries(wards.map((w) => [w, wardPerformance[w][metricKey]])),
       [MANCHESTER_LABEL]: manchesterAverage[metricKey],
+      ...(show2025
+        ? {
+            ...Object.fromEntries(wards.map((w) => [`${w} 2025`, wardPerformance2025[w][metricKey]])),
+            [`${MANCHESTER_LABEL} 2025`]: manchesterAverage2025[metricKey],
+          }
+        : {}),
     },
   ];
+  const bars = show2025 ? series.flatMap((s) => [s, `${s} 2025`]) : series;
   const primaryValue = wardPerformance[PRIMARY_WARD as WardName][metricKey];
   const delta = primaryValue - TARGET;
   const pid = usePatternId();
@@ -367,15 +376,20 @@ function MetricChart({
               strokeOpacity={0.45}
               strokeDasharray="4 3"
             />
-            {series.map((s) => (
-              <Bar
-                key={s}
-                dataKey={s}
-                fill={s === MANCHESTER_LABEL ? `url(#${pid})` : colorFor(s)}
-                radius={[2, 2, 0, 0]}
-                maxBarSize={34}
-              />
-            ))}
+            {bars.map((s) => {
+              const is2025 = s.endsWith(" 2025");
+              const base = is2025 ? s.slice(0, -5) : s;
+              return (
+                <Bar
+                  key={s}
+                  dataKey={s}
+                  fill={base === MANCHESTER_LABEL ? `url(#${pid})` : colorFor(base)}
+                  fillOpacity={is2025 ? 0.35 : 1}
+                  radius={[2, 2, 0, 0]}
+                  maxBarSize={34}
+                />
+              );
+            })}
           </BarChart>
         </ResponsiveContainer>
       </div>
