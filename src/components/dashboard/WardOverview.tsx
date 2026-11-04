@@ -9,7 +9,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { CalendarDays, Check, ChevronDown, MousePointerClick, SlidersHorizontal, Users } from "lucide-react";
+import { CalendarDays, Check, ChevronDown, MapPin, MousePointerClick, SlidersHorizontal, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -112,6 +112,10 @@ export function WardOverview({ onExploreCharacteristics }: { onExploreCharacteri
       <div className="border-b border-border pb-4">
         <div className="flex flex-wrap items-center gap-2">
           <h2 className="text-base font-semibold sm:text-lg">Ward overview</h2>
+          <span className="inline-flex items-center gap-1.5 rounded-sm bg-primary px-2.5 py-0.5 text-xs font-semibold text-primary-foreground">
+            <MapPin className="size-3.5" />
+            Ward in focus: {PRIMARY_WARD}
+          </span>
           <span className="inline-flex items-center gap-1 rounded-sm border border-primary/40 bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
             <CalendarDays className="size-3.5" />
             {DATA_PERIOD}
