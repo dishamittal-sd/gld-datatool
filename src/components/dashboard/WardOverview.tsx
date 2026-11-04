@@ -116,6 +116,10 @@ export function WardOverview() {
             <CalendarDays className="size-3.5" />
             {DATA_PERIOD}
           </span>
+          <span className="inline-flex items-center gap-1 rounded-sm border border-border bg-card px-2 py-0.5 text-xs font-semibold">
+            <Users className="size-3.5 text-primary" />
+            Total Reception Cohort: {cohortTotal.toLocaleString()} children
+          </span>
         </div>
         <div className="mt-2 max-w-4xl space-y-2 text-sm leading-relaxed text-muted-foreground">
           <p>
@@ -123,10 +127,26 @@ export function WardOverview() {
             Early Years Foundation Stage (EYFS) baseline data across Manchester’s 32 wards.
           </p>
           <p>
-            Collected at the start of the reception year in September 2026, this data establishes
-            the starting point for tracking progress toward Good Level of Development (GLD) targets
-            in July 2027. Target thresholds for each Early Learning Goal and developmental milestone
-            are set in line with Manchester Local Authority priorities.
+            Collected at the start of the reception year, when a child is 4 or 5 years old, this
+            data establishes the starting point for tracking progress toward Good Level of
+            Development (GLD) targets in July 2027. In partnership with Manchester Local Authority,
+            schools have collected this data using the Birth to 5 Matters framework. Because this
+            baseline assessment is bespoke to Manchester, there is no direct national comparison.
+            Target thresholds for each Early Learning Goal and developmental milestone are set in
+            line with Manchester Local Authority priorities.
+          </p>
+          <p>
+            You can explore detailed demographic and group breakdowns in the Characteristics View
+            tab. You can learn more about the national Early Years Foundation Stage Profile{" "}
+            <a
+              href="https://explore-education-statistics.service.gov.uk/find-statistics/early-years-foundation-stage-profile-results/2024-25"
+              target="_blank"
+              rel="noreferrer"
+              className="font-medium text-primary underline underline-offset-2"
+            >
+              here
+            </a>
+            .
           </p>
         </div>
       </div>
