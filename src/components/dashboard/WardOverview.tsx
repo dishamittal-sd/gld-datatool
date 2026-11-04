@@ -287,6 +287,7 @@ function ChartSection({
           {hint}
         </p>
       </div>
+      {footnote}
       <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2 xl:grid-cols-3">
         {keys.map((k) => (
           <MetricChart key={k} metricKey={k} wards={wards} show2025={show2025} onOpen={() => onOpen(k)} />
