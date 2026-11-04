@@ -266,12 +266,14 @@ function ChartSection({
   hint,
   keys,
   wards,
+  show2025,
   onOpen,
 }: {
   title: string;
   hint: string;
   keys: MetricKey[];
   wards: WardName[];
+  show2025: boolean;
   onOpen: (k: MetricKey) => void;
 }) {
   return (
@@ -285,9 +287,12 @@ function ChartSection({
       </div>
       <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2 xl:grid-cols-3">
         {keys.map((k) => (
-          <MetricChart key={k} metricKey={k} wards={wards} onOpen={() => onOpen(k)} />
+          <MetricChart key={k} metricKey={k} wards={wards} show2025={show2025} onOpen={() => onOpen(k)} />
         ))}
       </div>
+      {show2025 && (
+        <p className="text-xs text-muted-foreground">Faded bars show the 2025 baseline figures for each ward.</p>
+      )}
     </section>
   );
 }
