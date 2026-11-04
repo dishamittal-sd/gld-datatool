@@ -632,7 +632,7 @@ function Legend({
 }
 
 function buildKeyMessages(selected: WardName[]): string[] {
-  const gorton = wardPerformance[PRIMARY_WARD as WardName];
+  const gorton = wardPerformance[PRIMARY_WARD as WardName]!;
   const messages: string[] = [];
 
   const aboveTarget = METRICS.filter((m) => gorton[m.key] >= TARGET);

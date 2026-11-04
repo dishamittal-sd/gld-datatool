@@ -77,7 +77,7 @@ export const wardPerformance2025: Record<WardName, Record<MetricKey, number>> = 
       w,
       Object.fromEntries(
         (Object.keys(current) as MetricKey[]).map((k) => [k, clampPct(current[k] - 2 - rng() * 5)]),
-      ),
+      ) as Record<MetricKey, number>,
     ];
   }),
 );
