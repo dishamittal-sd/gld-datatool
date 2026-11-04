@@ -264,6 +264,7 @@ function Chip({ label, primary }: { label: string; primary?: boolean }) {
 function ChartSection({
   title,
   hint,
+  footnote,
   keys,
   wards,
   show2025,
@@ -271,6 +272,7 @@ function ChartSection({
 }: {
   title: string;
   hint: string;
+  footnote?: React.ReactNode;
   keys: MetricKey[];
   wards: WardName[];
   show2025: boolean;
