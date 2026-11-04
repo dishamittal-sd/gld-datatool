@@ -10,23 +10,88 @@ export const METRICS: { key: MetricKey; label: string; full: string }[] = [
   { key: "CLC", label: "CLC", full: "Communication & Language" },
   { key: "PSED", label: "PSED", full: "Personal, Social & Emotional Development" },
   { key: "PD", label: "PD", full: "Physical Development" },
-  { key: "PreSchool", label: "Pre-school", full: "Pre-school Attendance" },
+  { key: "PreSchool", label: "Early years provision", full: "Attended an early years provision" },
   { key: "TT", label: "TT", full: "Toilet Trained" },
   { key: "F", label: "F", full: "Feeding Independently" },
 ];
 
 export const PRIMARY_WARD = "Gorton";
 
-export type WardName = "Gorton" | "Levenshulme" | "Moss Side" | "Cheetham";
+export type WardName = string;
 
-export const WARDS: WardName[] = ["Gorton", "Levenshulme", "Moss Side", "Cheetham"];
+/** All 32 Manchester wards, alphabetical. */
+export const MANCHESTER_WARDS = [
+  "Ancoats & Beswick", "Ardwick", "Baguley", "Brooklands", "Burnage", "Charlestown",
+  "Cheetham", "Chorlton", "Chorlton Park", "Clayton & Openshaw", "Crumpsall", "Deansgate",
+  "Didsbury East", "Didsbury West", "Fallowfield", "Gorton", "Harpurhey", "Higher Blackley",
+  "Hulme", "Levenshulme", "Longsight", "Miles Platting & Newton Heath", "Moss Side", "Moston",
+  "Northenden", "Old Moat", "Piccadilly", "Rusholme", "Sharston", "Whalley Range",
+  "Withington", "Woodhouse Park",
+];
 
-export const wardPerformance: Record<WardName, Record<MetricKey, number>> = {
+export const WARDS: WardName[] = [...MANCHESTER_WARDS];
+
+/** Deterministic pseudo-random generator so mock ward figures stay stable between renders. */
+function seededRng(seed: string) {
+  let h = 2166136261;
+  for (const c of seed) h = Math.imul(h ^ c.charCodeAt(0), 16777619);
+  return () => {
+    h = Math.imul(h ^ (h >>> 15), 2246822507);
+    h = Math.imul(h ^ (h >>> 13), 3266489909);
+    return ((h ^= h >>> 16) >>> 0) / 4294967296;
+  };
+}
+
+const clampPct = (v: number) => Math.max(30, Math.min(95, Math.round(v)));
+
+const HAND_WRITTEN_PERFORMANCE: Record<string, Record<MetricKey, number>> = {
   Gorton: { CLC: 68, TT: 74, PSED: 71, F: 79, PD: 81, PreSchool: 66 },
   Levenshulme: { CLC: 76, TT: 88, PSED: 80, F: 84, PD: 77, PreSchool: 73 },
   "Moss Side": { CLC: 61, TT: 70, PSED: 64, F: 72, PD: 69, PreSchool: 58 },
   Cheetham: { CLC: 82, TT: 86, PSED: 83, F: 88, PD: 79, PreSchool: 84 },
 };
+
+function generatedPerformance(ward: string): Record<MetricKey, number> {
+  const rng = seededRng(`ward:${ward}`);
+  const base = 56 + rng() * 22;
+  return {
+    CLC: clampPct(base - 4 + rng() * 10),
+    TT: clampPct(base + rng() * 12),
+    PSED: clampPct(base - 2 + rng() * 10),
+    F: clampPct(base + 2 + rng() * 12),
+    PD: clampPct(base + rng() * 12),
+    PreSchool: clampPct(base - 6 + rng() * 10),
+  };
+}
+
+export const wardPerformance: Record<WardName, Record<MetricKey, number>> = Object.fromEntries(
+  MANCHESTER_WARDS.map((w) => [w, HAND_WRITTEN_PERFORMANCE[w] ?? generatedPerformance(w)]),
+);
+
+/** Mock 2025 baseline figures: same wards, slightly lower than the current cycle. */
+export const wardPerformance2025: Record<WardName, Record<MetricKey, number>> = Object.fromEntries(
+  MANCHESTER_WARDS.map((w) => {
+    const rng = seededRng(`ward-2025:${w}`);
+    const current = wardPerformance[w]!;
+    return [
+      w,
+      Object.fromEntries(
+        (Object.keys(current) as MetricKey[]).map((k) => [k, clampPct(current[k] - 2 - rng() * 5)]),
+      ) as Record<MetricKey, number>,
+    ];
+  }),
+);
+
+/** Mock reception cohort sizes per ward. */
+export const wardCohort: Record<WardName, number> = Object.fromEntries(
+  MANCHESTER_WARDS.map((w) => {
+    if (w === PRIMARY_WARD) return [w, 420];
+    const rng = seededRng(`cohort:${w}`);
+    return [w, 160 + Math.round(rng() * 340)];
+  }),
+);
+
+export const MANCHESTER_COHORT = MANCHESTER_WARDS.reduce((sum, w) => sum + wardCohort[w]!, 0);
 
 /* ---------- Tab 2: demographic breakdown ---------- */
 
@@ -300,7 +365,7 @@ export const DATA_PERIOD = "September 2026";
 
 export const MANCHESTER_LABEL = "Manchester Figure";
 
-/** Mock Manchester-wide average across all 32 wards. */
+/** Mock Manchester-wide figure across all 32 wards. */
 export const manchesterAverage: Record<MetricKey, number> = {
   CLC: 72,
   TT: 80,
@@ -308,6 +373,16 @@ export const manchesterAverage: Record<MetricKey, number> = {
   F: 81,
   PD: 78,
   PreSchool: 71,
+};
+
+/** Mock Manchester-wide figure for the 2025 baseline cycle. */
+export const manchesterAverage2025: Record<MetricKey, number> = {
+  CLC: 69,
+  TT: 77,
+  PSED: 72,
+  F: 78,
+  PD: 75,
+  PreSchool: 68,
 };
 
 export const ELG_KEYS: MetricKey[] = ["CLC", "PSED", "PD"];

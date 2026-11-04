@@ -9,10 +9,12 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { CalendarDays, Check, ChevronDown, MousePointerClick, SlidersHorizontal } from "lucide-react";
+import { CalendarDays, Check, ChevronDown, MousePointerClick, SlidersHorizontal, Users } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Switch } from "@/components/ui/switch";
 import {
   Sheet,
   SheetContent,
@@ -32,8 +34,11 @@ import {
   TARGET,
   WARDS,
   manchesterAverage,
+  manchesterAverage2025,
   subItemScore,
+  wardCohort,
   wardPerformance,
+  wardPerformance2025,
   type MetricKey,
   type WardName,
 } from "@/data/dashboardData";
@@ -80,9 +85,10 @@ const tooltipStyle = {
 };
 
 export function WardOverview() {
-  const [selected, setSelected] = useState<WardName[]>(["Levenshulme", "Cheetham"]);
+  const [selected, setSelected] = useState<WardName[]>([]);
   const [focusWard, setFocusWard] = useState<WardName>(PRIMARY_WARD as WardName);
   const [openMetric, setOpenMetric] = useState<MetricKey | null>(null);
+  const [show2025, setShow2025] = useState(false);
 
   const wards = useMemo<WardName[]>(
     () => [PRIMARY_WARD as WardName, ...WARDS.filter((w) => selected.includes(w))],
@@ -98,6 +104,8 @@ export function WardOverview() {
 
   const keyMessages = useMemo(() => buildKeyMessages(selected), [selected]);
 
+  const cohortTotal = useMemo(() => wards.reduce((sum, w) => sum + (wardCohort[w] ?? 0), 0), [wards]);
+
   return (
     <div className="space-y-6">
       <McrPattern id="mcr-stripes" />
@@ -108,6 +116,10 @@ export function WardOverview() {
             <CalendarDays className="size-3.5" />
             {DATA_PERIOD}
           </span>
+          <span className="inline-flex items-center gap-1 rounded-sm border border-border bg-card px-2 py-0.5 text-xs font-semibold">
+            <Users className="size-3.5 text-primary" />
+            Total Reception Cohort: {cohortTotal.toLocaleString()} children
+          </span>
         </div>
         <div className="mt-2 max-w-4xl space-y-2 text-sm leading-relaxed text-muted-foreground">
           <p>
@@ -115,10 +127,26 @@ export function WardOverview() {
             Early Years Foundation Stage (EYFS) baseline data across Manchester’s 32 wards.
           </p>
           <p>
-            Collected at the start of the reception year in September 2026, this data establishes
-            the starting point for tracking progress toward Good Level of Development (GLD) targets
-            in July 2027. Target thresholds for each Early Learning Goal and developmental milestone
-            are set in line with Manchester Local Authority priorities.
+            Collected at the start of the reception year, when a child is 4 or 5 years old, this
+            data establishes the starting point for tracking progress toward Good Level of
+            Development (GLD) targets in July 2027. In partnership with Manchester Local Authority,
+            schools have collected this data using the Birth to 5 Matters framework. Because this
+            baseline assessment is bespoke to Manchester, there is no direct national comparison.
+            Target thresholds for each Early Learning Goal and developmental milestone are set in
+            line with Manchester Local Authority priorities.
+          </p>
+          <p>
+            You can explore detailed demographic and group breakdowns in the Characteristics View
+            tab. You can learn more about the national Early Years Foundation Stage Profile{" "}
+            <a
+              href="https://explore-education-statistics.service.gov.uk/find-statistics/early-years-foundation-stage-profile-results/2024-25"
+              target="_blank"
+              rel="noreferrer"
+              className="font-medium text-primary underline underline-offset-2"
+            >
+              here
+            </a>
+            .
           </p>
         </div>
       </div>
@@ -132,7 +160,13 @@ export function WardOverview() {
           ))}
         </div>
 
-        <div className="flex shrink-0 flex-wrap items-center gap-2 sm:justify-end">
+        <div className="flex shrink-0 flex-wrap items-center gap-3 sm:justify-end">
+          <div className="flex items-center gap-2">
+            <Switch id="ward-show-2025" checked={show2025} onCheckedChange={setShow2025} />
+            <Label htmlFor="ward-show-2025" className="text-xs font-medium">
+              Show 2025 Data
+            </Label>
+          </div>
           <p className="flex items-center gap-1.5 text-sm font-semibold">
             <SlidersHorizontal className="size-4 text-primary" />
             Select wards to compare
@@ -144,7 +178,7 @@ export function WardOverview() {
                 <ChevronDown className="size-4 opacity-70" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent align="end" className="w-60 rounded-sm p-1">
+            <PopoverContent align="end" className="max-h-96 w-60 overflow-y-auto rounded-sm p-1">
               <div className="flex items-center justify-between px-2.5 py-1.5 text-xs text-muted-foreground">
                 <span className="font-medium text-foreground">{PRIMARY_WARD}</span>
                 <span className="label-caps">always shown</span>
@@ -173,6 +207,7 @@ export function WardOverview() {
         hint="Click a chart to see its sub-item breakdown"
         keys={ELG_KEYS}
         wards={wards}
+        show2025={show2025}
         onOpen={setOpenMetric}
       />
       <ChartSection
@@ -180,6 +215,7 @@ export function WardOverview() {
         hint="Click a chart to see correlated Early Learning Goals"
         keys={MILESTONE_KEYS}
         wards={wards}
+        show2025={show2025}
         onOpen={setOpenMetric}
       />
 
@@ -230,12 +266,14 @@ function ChartSection({
   hint,
   keys,
   wards,
+  show2025,
   onOpen,
 }: {
   title: string;
   hint: string;
   keys: MetricKey[];
   wards: WardName[];
+  show2025: boolean;
   onOpen: (k: MetricKey) => void;
 }) {
   return (
@@ -249,9 +287,12 @@ function ChartSection({
       </div>
       <div className="grid gap-px overflow-hidden rounded-md border border-border bg-border sm:grid-cols-2 xl:grid-cols-3">
         {keys.map((k) => (
-          <MetricChart key={k} metricKey={k} wards={wards} onOpen={() => onOpen(k)} />
+          <MetricChart key={k} metricKey={k} wards={wards} show2025={show2025} onOpen={() => onOpen(k)} />
         ))}
       </div>
+      {show2025 && (
+        <p className="text-xs text-muted-foreground">Faded bars show the 2025 baseline figures for each ward.</p>
+      )}
     </section>
   );
 }
@@ -259,10 +300,12 @@ function ChartSection({
 function MetricChart({
   metricKey,
   wards,
+  show2025,
   onOpen,
 }: {
   metricKey: MetricKey;
   wards: WardName[];
+  show2025: boolean;
   onOpen: () => void;
 }) {
   const metric = METRICS.find((m) => m.key === metricKey)!;
@@ -270,11 +313,18 @@ function MetricChart({
   const data = [
     {
       name: metric.label,
-      ...Object.fromEntries(wards.map((w) => [w, wardPerformance[w][metricKey]])),
+      ...Object.fromEntries(wards.map((w) => [w, wardPerformance[w]![metricKey]])),
       [MANCHESTER_LABEL]: manchesterAverage[metricKey],
+      ...(show2025
+        ? {
+            ...Object.fromEntries(wards.map((w) => [`${w} 2025`, wardPerformance2025[w]![metricKey]])),
+            [`${MANCHESTER_LABEL} 2025`]: manchesterAverage2025[metricKey],
+          }
+        : {}),
     },
   ];
-  const primaryValue = wardPerformance[PRIMARY_WARD as WardName][metricKey];
+  const bars = show2025 ? series.flatMap((s) => [s, `${s} 2025`]) : series;
+  const primaryValue = wardPerformance[PRIMARY_WARD as WardName]![metricKey];
   const delta = primaryValue - TARGET;
   const pid = usePatternId();
 
@@ -326,15 +376,20 @@ function MetricChart({
               strokeOpacity={0.45}
               strokeDasharray="4 3"
             />
-            {series.map((s) => (
-              <Bar
-                key={s}
-                dataKey={s}
-                fill={s === MANCHESTER_LABEL ? `url(#${pid})` : colorFor(s)}
-                radius={[2, 2, 0, 0]}
-                maxBarSize={34}
-              />
-            ))}
+            {bars.map((s) => {
+              const is2025 = s.endsWith(" 2025");
+              const base = is2025 ? s.slice(0, -5) : s;
+              return (
+                <Bar
+                  key={s}
+                  dataKey={s}
+                  fill={base === MANCHESTER_LABEL ? `url(#${pid})` : colorFor(base)}
+                  fillOpacity={is2025 ? 0.35 : 1}
+                  radius={[2, 2, 0, 0]}
+                  maxBarSize={34}
+                />
+              );
+            })}
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -415,7 +470,7 @@ function SubItemChart({ metricKey, ward }: { metricKey: MetricKey; ward: WardNam
   const data = items.map((it) => ({
     name: it.name,
     [MANCHESTER_LABEL]: subItemScore(manchesterAverage[metricKey], it.offset),
-    [ward]: subItemScore(wardPerformance[ward][metricKey], it.offset),
+    [ward]: subItemScore(wardPerformance[ward]![metricKey], it.offset),
   }));
   const pid = usePatternId();
 
@@ -577,33 +632,36 @@ function Legend({
 }
 
 function buildKeyMessages(selected: WardName[]): string[] {
-  const gorton = wardPerformance[PRIMARY_WARD as WardName];
+  const gorton = wardPerformance[PRIMARY_WARD as WardName]!;
   const messages: string[] = [];
 
   const aboveTarget = METRICS.filter((m) => gorton[m.key] >= TARGET);
   const strongest = [...METRICS].sort((a, b) => gorton[b.key] - gorton[a.key])[0]!;
   messages.push(
-    `${PRIMARY_WARD} meets or exceeds the ${TARGET}% benchmark target in ${aboveTarget.length} of ${METRICS.length} metrics, performing best in ${strongest.full} (${gorton[strongest.key]}%).`,
+    `${PRIMARY_WARD} meets or exceeds the ${TARGET}% benchmark target in ${aboveTarget.length} of ${METRICS.length} goals, performing best in ${strongest.full} (${gorton[strongest.key]}%).`,
   );
 
   const aboveMcr = METRICS.filter((m) => gorton[m.key] >= manchesterAverage[m.key]);
   messages.push(
-    `Against the Manchester figure, ${PRIMARY_WARD} is level or ahead in ${aboveMcr.length} of ${METRICS.length} metrics${
-      aboveMcr.length ? ` (${formatList(aboveMcr.map((m) => m.label))})` : ""
+    `Against the Manchester figure, ${PRIMARY_WARD} is level or ahead in ${aboveMcr.length} of ${METRICS.length} goals${
+      aboveMcr.length ? ` (${formatList(aboveMcr.map((m) => m.full))})` : ""
     }.`,
   );
 
-  if (!selected.length) {
+  if (selected.length) {
+    const wins = METRICS.filter((m) => selected.every((w) => gorton[m.key] > wardPerformance[w]![m.key]));
+    const losses = METRICS.filter((m) => selected.every((w) => gorton[m.key] < wardPerformance[w]![m.key]));
+    messages.push(
+      `Compared with ${formatList(selected)}, ${PRIMARY_WARD} leads on ${
+        wins.length ? formatList(wins.map((m) => m.full)) : "no goal"
+      } and trails on ${losses.length ? formatList(losses.map((m) => m.full)) : "no goal"}.`,
+    );
+  } else {
     messages.push("Select one or more comparison wards to benchmark Gorton against other wards.");
-    return messages;
   }
 
-  const wins = METRICS.filter((m) => selected.every((w) => gorton[m.key] > wardPerformance[w][m.key]));
-  const losses = METRICS.filter((m) => selected.every((w) => gorton[m.key] < wardPerformance[w][m.key]));
   messages.push(
-    `Compared with ${formatList(selected)}, ${PRIMARY_WARD} leads on ${
-      wins.length ? formatList(wins.map((m) => m.label)) : "no metric"
-    } and trails on ${losses.length ? formatList(losses.map((m) => m.label)) : "no metric"}.`,
+    "For detailed breakdowns by pupil characteristics and interconnecting characteristics, explore the Characteristics View tab.",
   );
   return messages;
 }

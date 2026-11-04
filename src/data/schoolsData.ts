@@ -1,10 +1,12 @@
 /** Synthetic Schools view data: all 32 Manchester wards and their schools. Mock figures only. */
-import { EYFS_AREAS, TARGET, manchester, type EyfsScores } from "@/data/dashboardData";
+import { EYFS_AREAS, MANCHESTER_WARDS, TARGET, manchester, type EyfsScores } from "@/data/dashboardData";
+
+export { MANCHESTER_WARDS };
 
 export const MILESTONES = [
   { key: "toiletTrained", label: "Toilet Trained" },
   { key: "feedIndependently", label: "Feeding Independently" },
-  { key: "preSchoolReady", label: "Pre-school Attendance" },
+  { key: "preSchoolReady", label: "Attended an early years provision" },
 ] as const;
 export type MilestoneKey = (typeof MILESTONES)[number]["key"];
 export type Milestones = Record<MilestoneKey, number>;
@@ -30,15 +32,6 @@ export type WardRecord = {
   kpis: Milestones;
   schools: SchoolRecord[];
 };
-
-export const MANCHESTER_WARDS = [
-  "Ancoats & Beswick", "Ardwick", "Baguley", "Brooklands", "Burnage", "Charlestown",
-  "Cheetham", "Chorlton", "Chorlton Park", "Clayton & Openshaw", "Crumpsall", "Deansgate",
-  "Didsbury East", "Didsbury West", "Fallowfield", "Gorton", "Harpurhey", "Higher Blackley",
-  "Hulme", "Levenshulme", "Longsight", "Miles Platting & Newton Heath", "Moss Side", "Moston",
-  "Northenden", "Old Moat", "Piccadilly", "Rusholme", "Sharston", "Whalley Range",
-  "Withington", "Woodhouse Park",
-];
 
 export const DEFAULT_WARD_ID = "gorton";
 
