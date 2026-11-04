@@ -216,7 +216,6 @@ function WardView({
           <div className="mt-3 divide-y divide-border overflow-hidden rounded-md border border-border bg-card">
             {ward.schools.map((s) => {
               const goals = goalsOnTarget(s.eyfs, s.kpis);
-              const r = goals >= 7 ? 80 : goals >= 4 ? 64 : 50;
               return (
                 <button
                   key={s.id}
@@ -228,7 +227,7 @@ function WardView({
                   <span className="min-w-0 flex-1 truncate text-sm font-medium group-hover:text-primary">
                     {s.name}
                   </span>
-                  <span className={cn("shrink-0 text-sm font-bold tabular-nums", ragTextClass(r))}>
+                  <span className="shrink-0 text-sm font-bold tabular-nums text-foreground">
                     {goals}/{TOTAL_GOALS}
                     <span className="ml-1 text-[11px] font-medium text-muted-foreground">
                       goals on target

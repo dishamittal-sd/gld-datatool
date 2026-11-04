@@ -298,7 +298,7 @@ export function ragLabel(value: number): string {
 
 export const DATA_PERIOD = "September 2026";
 
-export const MANCHESTER_LABEL = "Manchester Average";
+export const MANCHESTER_LABEL = "Manchester Figure";
 
 /** Mock Manchester-wide average across all 32 wards. */
 export const manchesterAverage: Record<MetricKey, number> = {

@@ -373,7 +373,7 @@ function DetailDrawer({
               <SheetTitle>{metric.full}</SheetTitle>
               <SheetDescription>
                 {isElg
-                  ? `Early learning goals for ${focusWard} compared with the Manchester average.`
+                  ? `Early learning goals for ${focusWard} compared with the Manchester figure.`
                   : `Early Learning Goals most closely linked with ${metric.full.toLowerCase()}, comparing children who achieved the milestone with those who did not.`}
               </SheetDescription>
             </SheetHeader>
@@ -588,7 +588,7 @@ function buildKeyMessages(selected: WardName[]): string[] {
 
   const aboveMcr = METRICS.filter((m) => gorton[m.key] >= manchesterAverage[m.key]);
   messages.push(
-    `Against the Manchester average, ${PRIMARY_WARD} is level or ahead in ${aboveMcr.length} of ${METRICS.length} metrics${
+    `Against the Manchester figure, ${PRIMARY_WARD} is level or ahead in ${aboveMcr.length} of ${METRICS.length} metrics${
       aboveMcr.length ? ` (${formatList(aboveMcr.map((m) => m.label))})` : ""
     }.`,
   );
