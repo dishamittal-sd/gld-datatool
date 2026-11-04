@@ -72,7 +72,7 @@ export const wardPerformance: Record<WardName, Record<MetricKey, number>> = Obje
 export const wardPerformance2025: Record<WardName, Record<MetricKey, number>> = Object.fromEntries(
   MANCHESTER_WARDS.map((w) => {
     const rng = seededRng(`ward-2025:${w}`);
-    const current = wardPerformance[w];
+    const current = wardPerformance[w]!;
     return [
       w,
       Object.fromEntries(
@@ -91,7 +91,7 @@ export const wardCohort: Record<WardName, number> = Object.fromEntries(
   }),
 );
 
-export const MANCHESTER_COHORT = MANCHESTER_WARDS.reduce((sum, w) => sum + wardCohort[w], 0);
+export const MANCHESTER_COHORT = MANCHESTER_WARDS.reduce((sum, w) => sum + wardCohort[w]!, 0);
 
 /* ---------- Tab 2: demographic breakdown ---------- */
 
